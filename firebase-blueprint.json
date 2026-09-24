@@ -1,0 +1,105 @@
+{
+  "entities": {
+    "Saree": {
+      "title": "Saree",
+      "description": "Handloom sarees in the store catalogue",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "hindiTitle": { "type": "string" },
+        "sku": { "type": "string" },
+        "price": { "type": "number" },
+        "originalPrice": { "type": "number" },
+        "discountPercent": { "type": "number" },
+        "fabric": { "type": "string" },
+        "category": { "type": "string" },
+        "color": { "type": "string" },
+        "colorHex": { "type": "string" },
+        "occasion": { "type": "string" },
+        "zariType": { "type": "string" },
+        "blousePiece": { "type": "string" },
+        "length": { "type": "string" },
+        "border": { "type": "string" },
+        "work": { "type": "string" },
+        "description": { "type": "string" },
+        "images": { "type": "array" },
+        "inStock": { "type": "boolean" },
+        "rating": { "type": "number" },
+        "reviewsCount": { "type": "number" },
+        "isBestseller": { "type": "boolean" },
+        "isTrending": { "type": "boolean" },
+        "isNewArrival": { "type": "boolean" },
+        "tags": { "type": "array" },
+        "careInstructions": { "type": "string" }
+      },
+      "required": ["id", "title", "price", "fabric"]
+    },
+    "SareeReel": {
+      "title": "SareeReel",
+      "description": "360 degree video drapes and reels for sarees",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "sareeId": { "type": "string" },
+        "title": { "type": "string" },
+        "caption": { "type": "string" },
+        "videoUrl": { "type": "string" },
+        "thumbnailUrl": { "type": "string" },
+        "likes": { "type": "number" },
+        "views": { "type": "string" },
+        "modelOrCreator": { "type": "string" },
+        "creatorHandle": { "type": "string" },
+        "musicTitle": { "type": "string" },
+        "drapeStyle": { "type": "string" }
+      },
+      "required": ["id", "title", "videoUrl"]
+    },
+    "Customer": {
+      "title": "Customer",
+      "description": "Customer profile and authentication data",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "phone": { "type": "string" },
+        "email": { "type": "string" },
+        "address": { "type": "object" },
+        "registeredAt": { "type": "string" }
+      },
+      "required": ["id", "phone"]
+    },
+    "Order": {
+      "title": "Order",
+      "description": "Customer saree orders",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "phone": { "type": "string" },
+        "customerName": { "type": "string" },
+        "totalAmount": { "type": "number" },
+        "status": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "phone", "totalAmount"]
+    }
+  },
+  "firestore": {
+    "/sarees/{sareeId}": {
+      "schema": "Saree",
+      "description": "Store live catalogue of sarees for customer shopping"
+    },
+    "/reels/{reelId}": {
+      "schema": "SareeReel",
+      "description": "Store 360 video reels of sarees"
+    },
+    "/customers/{customerId}": {
+      "schema": "Customer",
+      "description": "Customer profile store"
+    },
+    "/orders/{orderId}": {
+      "schema": "Order",
+      "description": "Store customer orders"
+    }
+  }
+}

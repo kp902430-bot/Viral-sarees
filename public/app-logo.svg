@@ -1,0 +1,160 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000" width="100%" height="100%" shape-rendering="geometricPrecision" text-rendering="geometricPrecision" image-rendering="optimizeQuality">
+  <defs>
+    <!-- Rich Wine / Maroon Velvet Gradient Background -->
+    <linearGradient id="bgMaroonGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#4C0416" />
+      <stop offset="28%" stop-color="#3B0211" />
+      <stop offset="65%" stop-color="#26000A" />
+      <stop offset="100%" stop-color="#180006" />
+    </linearGradient>
+
+    <!-- Multi-Stop Ultra-HD Gleaming Metallic Gold -->
+    <linearGradient id="metallicGold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFF8D1" />
+      <stop offset="18%" stop-color="#F5D36F" />
+      <stop offset="42%" stop-color="#DEAA37" />
+      <stop offset="68%" stop-color="#B8851E" />
+      <stop offset="88%" stop-color="#8F620D" />
+      <stop offset="100%" stop-color="#E8BE52" />
+    </linearGradient>
+
+    <!-- Shimmering Bright Gold for Typography & Crown -->
+    <linearGradient id="goldBright" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFF7CD" />
+      <stop offset="25%" stop-color="#F8D676" />
+      <stop offset="55%" stop-color="#E3B341" />
+      <stop offset="85%" stop-color="#BF8D23" />
+      <stop offset="100%" stop-color="#F3CB62" />
+    </linearGradient>
+
+    <!-- Saree Crimson Ruby Silk Gradient -->
+    <linearGradient id="sareeCrimson" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#D91648" />
+      <stop offset="35%" stop-color="#A50028" />
+      <stop offset="70%" stop-color="#73001B" />
+      <stop offset="100%" stop-color="#4A0010" />
+    </linearGradient>
+
+    <!-- Golden Pill Badge Gradient -->
+    <linearGradient id="pillGoldGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#FFEFA8" />
+      <stop offset="25%" stop-color="#F8D46F" />
+      <stop offset="60%" stop-color="#DEAA37" />
+      <stop offset="85%" stop-color="#F5D36F" />
+      <stop offset="100%" stop-color="#FFF2BA" />
+    </linearGradient>
+
+    <!-- Depth Shadows -->
+    <filter id="logoShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="12" stdDeviation="16" flood-color="#000000" flood-opacity="0.4" />
+    </filter>
+    <filter id="textGlow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="4" stdDeviation="5" flood-color="#000000" flood-opacity="0.35" />
+    </filter>
+  </defs>
+
+  <!-- 1. SQUIRCLE EMBLEM BASE WITH DOUBLE GOLD BORDER -->
+  <!-- Outer Gold Border Frame -->
+  <rect x="28" y="28" width="944" height="944" rx="180" ry="180" fill="url(#bgMaroonGrad)" stroke="url(#metallicGold)" stroke-width="14" filter="url(#logoShadow)" />
+  <!-- Delicate Inner Pinstripe Border -->
+  <rect x="52" y="52" width="896" height="896" rx="156" ry="156" fill="none" stroke="url(#metallicGold)" stroke-width="2.6" stroke-opacity="0.85" />
+
+  <!-- 2. INDIAN WOMAN SILHOUETTE (Upper Left, Graceful Profile) -->
+  <g id="woman-silhouette-art" transform="translate(180, 102)">
+    <!-- Sleek Juda (Hair Bun) -->
+    <path d="M104 100 C74 80, 60 44, 88 16 C106 -4, 150 0, 162 26 C174 50, 158 88, 128 102 Z" fill="#150004" />
+    
+    <!-- White Floral Blossom (Jasmine Flower) on Hair Bun -->
+    <g transform="translate(68, 68)">
+      <circle cx="0" cy="0" r="4.5" fill="#E8B923" />
+      <ellipse cx="-7" cy="-7" rx="7" ry="5" transform="rotate(-30, -7, -7)" fill="#FFFFFF" stroke="#E5DACD" stroke-width="1" />
+      <ellipse cx="6" cy="-8" rx="7" ry="5" transform="rotate(30, 6, -8)" fill="#FFFFFF" stroke="#E5DACD" stroke-width="1" />
+      <ellipse cx="9" cy="4" rx="7" ry="5" transform="rotate(75, 9, 4)" fill="#FFFFFF" stroke="#E5DACD" stroke-width="1" />
+      <ellipse cx="-2" cy="10" rx="7" ry="5" transform="rotate(130, -2, 10)" fill="#FFFFFF" stroke="#E5DACD" stroke-width="1" />
+      <ellipse cx="-9" cy="2" rx="7" ry="5" transform="rotate(-75, -9, 2)" fill="#FFFFFF" stroke="#E5DACD" stroke-width="1" />
+      <circle cx="0" cy="0" r="3.2" fill="#F5C538" />
+    </g>
+
+    <!-- Slender Graceful Face & Neck Profile (Facing Left) -->
+    <path d="M138 34 C148 50, 158 64, 154 82 C150 94, 134 104, 130 114 C122 126, 128 148, 132 168 C134 186, 130 206, 120 226 C114 218, 106 196, 106 174 C104 152, 98 134, 110 120 C114 114, 120 98, 116 82 C112 70, 124 46, 138 34 Z" fill="#FFF2E8" />
+    
+    <!-- Dangling Golden Jhumka (Indian Traditional Earring) -->
+    <g transform="translate(112, 108)">
+      <circle cx="0" cy="0" r="4" fill="url(#metallicGold)" />
+      <!-- Dome bell -->
+      <path d="M-6 8 C-6 5, 6 5, 6 8 L7 12 C7 14, -7 14, -7 12 Z" fill="url(#metallicGold)" />
+      <line x1="-4" y1="13" x2="-4" y2="18" stroke="url(#metallicGold)" stroke-width="1.2" />
+      <circle cx="-4" cy="19" r="1.3" fill="#FFF" />
+      <line x1="0" y1="13" x2="0" y2="19" stroke="url(#metallicGold)" stroke-width="1.2" />
+      <circle cx="0" cy="20" r="1.4" fill="#FFF" />
+      <line x1="4" y1="13" x2="4" y2="18" stroke="url(#metallicGold)" stroke-width="1.2" />
+      <circle cx="4" cy="19" r="1.3" fill="#FFF" />
+    </g>
+
+    <!-- Luxurious Draped Saree Bodice & Pallu Folds -->
+    <path d="M124 174 C140 184, 162 204, 156 242 C150 286, 110 338, 78 372 C60 346, 66 294, 84 246 C94 214, 108 190, 124 174 Z" fill="url(#sareeCrimson)" stroke="url(#metallicGold)" stroke-width="4.5" />
+    
+    <!-- Golden Zari Embroidery Pleat Folds -->
+    <path d="M96 238 Q118 280 96 332" stroke="url(#metallicGold)" stroke-width="4.2" fill="none" stroke-linecap="round" />
+    <path d="M108 252 Q134 294 116 344" stroke="url(#metallicGold)" stroke-width="3.8" fill="none" stroke-linecap="round" />
+    <path d="M122 268 Q148 310 134 358" stroke="url(#metallicGold)" stroke-width="3.2" fill="none" stroke-linecap="round" />
+  </g>
+
+  <!-- 3. CALLIGRAPHIC "Viral" LOGOTYPE WITH EXTENDED SWOOP -->
+  <!-- Left Wing of "V" swooping down from woman's pallu -->
+  <g filter="url(#textGlow)">
+    <!-- Outer Golden Swoop Outline -->
+    <path d="M236 340 C280 430, 318 534, 344 656 C314 564, 276 468, 236 386 Z" fill="url(#metallicGold)" />
+    
+    <!-- Red Silk Infill of Left "V" Flourish -->
+    <path d="M256 380 C300 464, 334 562, 356 668 C346 640, 318 528, 282 444 Z" fill="url(#sareeCrimson)" stroke="url(#metallicGold)" stroke-width="3" />
+    
+    <!-- Golden Core V Spine -->
+    <path d="M88 368 C160 340, 204 380, 248 480 C296 590, 326 664, 344 686 C362 660, 412 516, 458 392 L508 398 C452 546, 388 688, 352 704 C334 704, 314 670, 272 562 C236 470, 196 404, 148 388 C118 378, 98 376, 88 368 Z" fill="url(#goldBright)" />
+
+    <!-- 4. ROYAL 5-POINT GOLDEN CROWN ON THE 'r' -->
+    <g transform="translate(488, 304)">
+      <!-- 5-Point Crown Shape -->
+      <path d="M4 42 L16 14 L30 32 L48 4 L66 32 L80 14 L92 42 Z" fill="url(#goldBright)" stroke="url(#metallicGold)" stroke-width="2.5" />
+      <!-- Base Ribbon of Crown -->
+      <rect x="2" y="44" width="92" height="9" rx="4.5" fill="url(#metallicGold)" />
+      <!-- Pearls on Crown Tips -->
+      <circle cx="16" cy="12" r="3.6" fill="#FFF" stroke="url(#metallicGold)" stroke-width="1.2" />
+      <circle cx="30" cy="30" r="3" fill="#FFF" stroke="url(#metallicGold)" stroke-width="1" />
+      <circle cx="48" cy="3" r="4.2" fill="#FFF" stroke="url(#metallicGold)" stroke-width="1.2" />
+      <circle cx="66" cy="30" r="3" fill="#FFF" stroke="url(#metallicGold)" stroke-width="1" />
+      <circle cx="80" cy="12" r="3.6" fill="#FFF" stroke="url(#metallicGold)" stroke-width="1.2" />
+    </g>
+
+    <!-- 5. "iral" LETTERS IN MAJESTIC SERIF TYPOGRAPHY -->
+    <!-- Custom Drawn or High Precision Text Vector -->
+    <text x="472" y="586" fill="url(#goldBright)" font-family="'Cinzel', 'Playfair Display', Georgia, serif" font-size="240" font-weight="700" letter-spacing="4">
+      <tspan dx="0">i</tspan><tspan dx="12">r</tspan><tspan dx="8">a</tspan><tspan dx="10">l</tspan>
+    </text>
+  </g>
+
+  <!-- 6. HORIZONTAL RULED "— SAREES —" BANNER -->
+  <g id="sarees-rule-bar" filter="url(#textGlow)">
+    <!-- Left Divider Line -->
+    <line x1="120" y1="662" x2="380" y2="662" stroke="url(#metallicGold)" stroke-width="6" stroke-linecap="round" />
+    <!-- "SAREES" Tracked Capitals -->
+    <text x="618" y="680" text-anchor="middle" fill="url(#goldBright)" font-family="'Cinzel', 'Plus Jakarta Sans', system-ui, sans-serif" font-size="64" font-weight="800" letter-spacing="24">
+      SAREES
+    </text>
+    <!-- Right Divider Line -->
+    <line x1="840" y1="662" x2="900" y2="662" stroke="url(#metallicGold)" stroke-width="6" stroke-linecap="round" />
+  </g>
+
+  <!-- 7. PRIMARY TAGLINE: "Trend humse shuru hota hai." -->
+  <text x="500" y="756" text-anchor="middle" fill="#FFFFFF" font-family="'Playfair Display', Georgia, serif" font-style="italic" font-size="44" font-weight="500" letter-spacing="1.5" filter="url(#textGlow)">
+    Trend humse shuru hota hai.
+  </text>
+
+  <!-- 8. PILL BADGE: "Price Kam, Quality Mein Dum" -->
+  <g transform="translate(178, 804)" filter="url(#logoShadow)">
+    <rect width="644" height="80" rx="40" fill="url(#pillGoldGrad)" stroke="#FFF4C4" stroke-width="3" />
+    <text x="322" y="52" text-anchor="middle" fill="#240008" font-family="'Plus Jakarta Sans', system-ui, -apple-system, sans-serif" font-size="30" font-weight="900" letter-spacing="1.2">
+      Price Kam, Quality Mein Dum
+    </text>
+  </g>
+</svg>

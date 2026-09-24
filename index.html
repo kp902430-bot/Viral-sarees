@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Viral Sarees - Trend humse shuru hota hai</title>
+    <meta name="description" content="Viral Sarees - Trend humse shuru hota hai. Price Kam, Quality Mein Dum. Exclusive sarees with 360° reels, live order tracking, and Cash on Delivery." />
+    <meta property="og:title" content="Viral Sarees - Trend humse shuru hota hai" />
+    <meta property="og:description" content="Viral Sarees - Trend humse shuru hota hai. Price Kam, Quality Mein Dum. Exclusive sarees with 360° reels, live order tracking, and Cash on Delivery." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://viralsarees.com/" />
+    <meta property="og:site_name" content="Viral Sarees" />
+    <meta property="og:image" content="https://viralsarees.com/app-logo.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Viral Sarees - Trend humse shuru hota hai" />
+    <meta name="twitter:description" content="Viral Sarees - Trend humse shuru hota hai. Price Kam, Quality Mein Dum. Exclusive sarees with 360° reels, live order tracking, and Cash on Delivery." />
+    <meta name="twitter:image" content="https://viralsarees.com/app-logo.png" />
+    <link rel="canonical" href="https://viralsarees.com/" />
+    
+    <!-- PWA & Mobile Install Meta Tags -->
+    <meta name="theme-color" content="#800020" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Viral Sarees" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="icon" type="image/svg+xml" href="/icon.svg" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/pwa-192x192.png" />
+    <link rel="shortcut icon" href="/favicon.png" />
+    <link rel="manifest" href="/manifest.json" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Rozha+One&display=swap" rel="stylesheet">
+  </head>
+  <body class="bg-[#FCF9F5] text-slate-900 antialiased selection:bg-rose-100 selection:text-rose-900 overflow-x-hidden w-full">
+    <div id="root">
+      <!-- Initial Instant Branded Shell & Auto-Recovery Fallback -->
+      <div id="vls-initial-loader" style="min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;background-color:#FCF9F5;color:#800020;font-family:system-ui,-apple-system,sans-serif;padding:24px;text-align:center;">
+        <div style="width:44px;height:44px;border:3.5px solid #800020;border-top-color:#d97706;border-radius:50%;animation:vls-spin 0.8s linear infinite;margin-bottom:16px;"></div>
+        <div style="font-size:24px;font-weight:800;letter-spacing:1px;font-family:Cinzel,serif;color:#800020;">VIRAL SAREES</div>
+        <div style="font-size:13px;color:#78350f;margin-top:6px;font-weight:700;letter-spacing:0.5px;font-style:italic;">Trend humse shuru hota hai.</div>
+        <div style="display:inline-block;margin-top:8px;background:linear-gradient(135deg,#eab308,#ca8a04);color:#3b0712;padding:4px 12px;border-radius:9999px;font-size:10px;font-weight:800;letter-spacing:0.5px;">Price Kam, Quality Mein Dum</div>
+        <div id="vls-slow-network-notice" style="display:none;margin-top:20px;background:#ffffff;border:1.5px solid #fcd34d;border-radius:16px;padding:16px;max-width:320px;box-shadow:0 8px 24px rgba(128,0,32,0.08);">
+          <div style="font-size:12px;color:#78350f;font-weight:bold;margin-bottom:4px;">Page open hone me samay lag raha hai?</div>
+          <div style="font-size:11px;color:#57534e;line-height:1.4;margin-bottom:12px;">Automatic self-healing &amp; fast reload active.</div>
+          <button onclick="try{if('serviceWorker' in navigator){navigator.serviceWorker.getRegistrations().then(function(rs){rs.forEach(function(r){r.unregister()})})};if('caches' in window){caches.keys().then(function(ks){ks.forEach(function(k){caches.delete(k)})})}}catch(e){}window.location.reload();" style="width:100%;background:linear-gradient(to right,#800020,#9b111e);color:#fef3c7;border:none;border-radius:10px;padding:10px 14px;font-size:12px;font-weight:bold;cursor:pointer;box-shadow:0 4px 12px rgba(128,0,32,0.2);">
+            🔄 Refresh &amp; Open Store
+          </button>
+        </div>
+      </div>
+      <style>
+        @keyframes vls-spin { to { transform: rotate(360deg); } }
+      </style>
+      <script>
+        setTimeout(function() {
+          var notice = document.getElementById('vls-slow-network-notice');
+          if (notice && document.getElementById('vls-initial-loader')) {
+            notice.style.display = 'block';
+          }
+        }, 3200);
+      </script>
+    </div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
+

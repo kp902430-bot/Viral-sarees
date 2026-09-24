@@ -1,0 +1,6 @@
+{
+  "name": "Viral Sarees",
+  "description": "Viral Sarees - Trend humse shuru hota hai. Price Kam, Quality Mein Dum. Shop the latest viral and trending sarees with live order tracking and COD.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

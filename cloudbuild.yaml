@@ -1,0 +1,29 @@
+# Google Cloud Build configuration for Viral Sarees
+steps:
+  # 1. Build container image via Cloud Build
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', 'gcr.io/$PROJECT_ID/viral-sarees:$COMMIT_SHA', '-t', 'gcr.io/$PROJECT_ID/viral-sarees:latest', '.']
+
+  # 2. Push container image to Google Container / Artifact Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/$PROJECT_ID/viral-sarees:latest']
+
+  # 3. Deploy container image to Google Cloud Run under service name "viral-sarees"
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args:
+      - 'run'
+      - 'deploy'
+      - 'viral-sarees'
+      - '--image'
+      - 'gcr.io/$PROJECT_ID/viral-sarees:latest'
+      - '--region'
+      - 'asia-southeast1'
+      - '--platform'
+      - 'managed'
+      - '--allow-unauthenticated'
+      - '--port'
+      - '8080'
+
+images:
+  - 'gcr.io/$PROJECT_ID/viral-sarees:latest'
