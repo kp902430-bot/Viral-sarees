@@ -14,6 +14,19 @@ import { Order, CustomerProfile } from '../types';
 
 const ORDERS_COLLECTION = 'orders';
 const CUSTOMERS_COLLECTION = 'customers';
+const LOGINS_COLLECTION = 'customer_logins';
+
+export interface CustomerLoginRecord {
+  id: string;
+  customerId: string;
+  name: string;
+  email: string;
+  phone: string;
+  loginTimestamp: number;
+  loginDate: string;
+  city?: string;
+  pincode?: string;
+}
 
 // Clean helper to remove any undefined properties so Firestore doesn't reject write operations
 function cleanData<T extends Record<string, any>>(data: T): Record<string, any> {
@@ -196,6 +209,57 @@ export async function saveCustomerToCloud(customer: CustomerProfile): Promise<vo
   const cleaned = cleanData(customer);
   const docRef = doc(db, CUSTOMERS_COLLECTION, customer.id);
   await setDoc(docRef, cleaned, { merge: true });
+}
+
+/**
+ * Record a customer login event to Cloud Firestore for the owner ledger
+ */
+export async function recordCustomerLoginToCloud(customer: CustomerProfile): Promise<void> {
+  if (!customer) return;
+  try {
+    const loginId = `log-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
+    const record: CustomerLoginRecord = {
+      id: loginId,
+      customerId: customer.id || `cust-${Date.now()}`,
+      name: customer.name || 'Valued Customer',
+      email: customer.email || '',
+      phone: customer.phone || '',
+      loginTimestamp: Date.now(),
+      loginDate: new Date().toLocaleString('en-IN', {
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+      }),
+      city: customer.address?.city || '',
+      pincode: customer.address?.pincode || ''
+    };
+    const cleaned = cleanData(record);
+    await setDoc(doc(db, LOGINS_COLLECTION, loginId), cleaned);
+  } catch (err) {
+    console.warn('Could not record customer login event to Firestore:', err);
+  }
+}
+
+/**
+ * Fetch all customer login events from Cloud Firestore
+ */
+export async function fetchCustomerLoginsFromCloud(): Promise<CustomerLoginRecord[]> {
+  try {
+    const snap = await getDocs(collection(db, LOGINS_COLLECTION));
+    const list: CustomerLoginRecord[] = [];
+    snap.forEach((d) => {
+      const data = d.data() as CustomerLoginRecord;
+      if (data && data.id) list.push(data);
+    });
+    list.sort((a, b) => (b.loginTimestamp || 0) - (a.loginTimestamp || 0));
+    return list;
+  } catch (err) {
+    console.warn('Could not fetch customer logins from Firestore:', err);
+    return [];
+  }
 }
 
 /**

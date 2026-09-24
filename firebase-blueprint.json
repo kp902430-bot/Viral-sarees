@@ -82,6 +82,23 @@
         "createdAt": { "type": "string" }
       },
       "required": ["id", "phone", "totalAmount"]
+    },
+    "CustomerLogin": {
+      "title": "CustomerLogin",
+      "description": "Log of customer login activities for owner records",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "customerId": { "type": "string" },
+        "name": { "type": "string" },
+        "email": { "type": "string" },
+        "phone": { "type": "string" },
+        "loginTimestamp": { "type": "number" },
+        "loginDate": { "type": "string" },
+        "city": { "type": "string" },
+        "pincode": { "type": "string" }
+      },
+      "required": ["id", "loginDate"]
     }
   },
   "firestore": {
@@ -100,6 +117,10 @@
     "/orders/{orderId}": {
       "schema": "Order",
       "description": "Store customer orders"
+    },
+    "/customer_logins/{loginId}": {
+      "schema": "CustomerLogin",
+      "description": "Store customer login events for owner spreadsheet"
     }
   }
 }

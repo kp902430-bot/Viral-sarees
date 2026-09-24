@@ -56,9 +56,12 @@ import {
   updateOrderInCloud,
   subscribeToCustomers,
   saveCustomerToCloud,
+  recordCustomerLoginToCloud,
   syncLocalOrdersToCloud,
   fetchOrdersFromCloud
 } from './services/orderService';
+import { broadcastNewCatalogueEmail } from './services/catalogueBroadcastService';
+import { notifyOwnerOfNewOrder, notifyOwnerOfCustomerLogin } from './services/ownerNotificationService';
 import { OwnerAuthModal } from './components/OwnerAuthModal';
 import { OrderLoginPromptModal } from './components/OrderLoginPromptModal';
 
@@ -584,11 +587,21 @@ export default function App() {
     }
   };
 
-  const handleAddNewSaree = async (newSaree: Saree) => {
+  const handleAddNewSaree = async (newSaree: Saree, customTagline?: string, shouldBroadcast: boolean = true) => {
     setSarees((prev) => [newSaree, ...prev]);
     showToast(`🎉 "${newSaree.title}" published to live catalogue!`);
     try {
       await saveSareeToCloud(newSaree);
+      if (shouldBroadcast) {
+        // Automatically broadcast new catalogue alert to all registered customers via email
+        broadcastNewCatalogueEmail(newSaree, customers, customTagline).then((res) => {
+          if (res.success && res.sentCount > 0) {
+            showToast(`📢 New arrival email sent to ${res.sentCount} customer(s)!`);
+          }
+        }).catch((broadcastErr) => {
+          console.warn('Background broadcast error:', broadcastErr);
+        });
+      }
     } catch (err) {
       console.error('Failed to sync new saree to Cloud Firestore:', err);
     }
@@ -676,21 +689,43 @@ export default function App() {
   // Customer Account Management
   const handleCustomerLogin = (profile: CustomerProfile) => {
     setCurrentCustomer(profile);
+    const updatedProfile: CustomerProfile = {
+      ...profile,
+      lastLoginAt: new Date().toLocaleString('en-IN', {
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      })
+    };
+
     setCustomers((prev) => {
       const cleanPhone = profile.phone.replace(/\D/g, '');
       const existsIndex = prev.findIndex(
-        (c) => c.phone.replace(/\D/g, '') === cleanPhone || (profile.email && c.email === profile.email)
+        (c) => (c.phone && c.phone.replace(/\D/g, '') === cleanPhone) || (profile.email && c.email === profile.email)
       );
       if (existsIndex >= 0) {
         const updated = [...prev];
         updated[existsIndex] = {
           ...updated[existsIndex],
-          ...profile,
-          lastLoginAt: 'Just now'
+          ...updatedProfile
         };
         return updated;
       }
-      return [profile, ...prev];
+      return [updatedProfile, ...prev];
+    });
+
+    // Save customer profile and login record to Cloud Firestore in real time
+    saveCustomerToCloud(updatedProfile).catch((err) => {
+      console.warn('Could not sync customer to Firestore on login:', err);
+    });
+    recordCustomerLoginToCloud(updatedProfile).catch((err) => {
+      console.warn('Could not record customer login event:', err);
+    });
+    // Send automated real-time notification to owner
+    notifyOwnerOfCustomerLogin(updatedProfile).catch((err) => {
+      console.warn('Could not notify owner of login event:', err);
     });
 
     const normalizedEmail = (profile.email || '').trim().toLowerCase();
@@ -745,6 +780,11 @@ export default function App() {
     // Persist new order to Cloud Firestore in real time so owner receives it instantly!
     saveOrderToCloud(newOrder).catch((err) => {
       console.warn('Could not sync order to Cloud Firestore immediately:', err);
+    });
+
+    // Notify store owner with real-time email containing complete Excel-like order breakdown
+    notifyOwnerOfNewOrder(newOrder).catch((err) => {
+      console.warn('Could not notify owner of new order:', err);
     });
 
     // Update or register customer record in store customer database
@@ -1522,6 +1562,7 @@ export default function App() {
         isOpen={isAddSareeOpen}
         onClose={() => setIsAddSareeOpen(false)}
         onAddSaree={handleAddNewSaree}
+        customersCount={customers.length}
       />
 
       {/* Add Saree Reel Modal (Owner Restricted) */}

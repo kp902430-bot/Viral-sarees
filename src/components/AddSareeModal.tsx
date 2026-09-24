@@ -10,7 +10,10 @@ import {
   Crown, 
   AlertCircle,
   Loader2,
-  Plus
+  Plus,
+  Mail,
+  Sparkles,
+  Send
 } from 'lucide-react';
 import { Saree, Fabric, Occasion } from '../types';
 import { compressImageFile } from '../utils/imageCompressor';
@@ -18,13 +21,15 @@ import { compressImageFile } from '../utils/imageCompressor';
 interface AddSareeModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onAddSaree: (newSaree: Saree) => void;
+  onAddSaree: (newSaree: Saree, tagline?: string, shouldBroadcast?: boolean) => void;
+  customersCount?: number;
 }
 
 export const AddSareeModal: React.FC<AddSareeModalProps> = ({
   isOpen,
   onClose,
-  onAddSaree
+  onAddSaree,
+  customersCount = 0
 }) => {
   const [title, setTitle] = useState('');
   const [fabric, setFabric] = useState<string>('Banarasi Silk');
@@ -39,6 +44,19 @@ export const AddSareeModal: React.FC<AddSareeModalProps> = ({
   const [blousePiece, setBlousePiece] = useState('Unstitched Brocade Silk (0.8 Meter)');
   const [length, setLength] = useState('5.5 Meters Saree + 0.8 Meter Blouse');
   const [description, setDescription] = useState('');
+
+  // Automatic Email Broadcast to Customers State
+  const [sendEmailBroadcast, setSendEmailBroadcast] = useState(true);
+  const [selectedTaglineIndex, setSelectedTaglineIndex] = useState(0);
+  const [customTagline, setCustomTagline] = useState('');
+
+  const PRESET_TAGLINES = [
+    '✨ Royal Elegance Just Arrived! Trend humse shuru hota hai — Naya Saree Catalogue Abhi Live Hai!',
+    '🔥 Limited Edition Festive Drapes: Pehle Aap, Fir Zamana!',
+    '👑 Handpicked Luxury at Wholesale Rates: Nayi Viral Saree abhi store me live hai!',
+    '💃 Shaadi & Tyohar Special: Har Nazar Aap Par — Exclusive New Collection!',
+    '🌟 Pure Banarasi Silk Weaving Masterpiece — Abhi Order Karein!'
+  ];
   
   // Direct Photo Upload State (Replaces text URL)
   const [images, setImages] = useState<string[]>([]);
@@ -169,7 +187,8 @@ export const AddSareeModal: React.FC<AddSareeModalProps> = ({
       tags: ['New Arrival', finalCategory, 'Silk Mark Verified', 'Owner Pick']
     };
 
-    onAddSaree(newSaree);
+    const chosenTagline = selectedTaglineIndex === -1 ? (customTagline.trim() || PRESET_TAGLINES[0]) : PRESET_TAGLINES[selectedTaglineIndex];
+    onAddSaree(newSaree, chosenTagline, sendEmailBroadcast);
     setSuccessMsg(true);
     setTimeout(() => {
       setSuccessMsg(false);
@@ -620,6 +639,113 @@ export const AddSareeModal: React.FC<AddSareeModalProps> = ({
               />
               <span>In Stock & Ready for Dispatch</span>
             </label>
+          </div>
+
+          {/* AUTOMATIC CUSTOMER EMAIL BROADCAST WITH VIRAL TAGLINES */}
+          <div className="p-4 bg-gradient-to-br from-amber-50/80 via-rose-50/40 to-white border-2 border-amber-300/80 rounded-2xl space-y-3 shadow-xs">
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-xl bg-[#800020] text-amber-300 flex items-center justify-center shadow-xs">
+                  <Mail className="w-4 h-4" />
+                </div>
+                <div>
+                  <h4 className="font-bold text-stone-900 text-sm flex items-center gap-1.5">
+                    <span>Automatic Customer Email Blast</span>
+                    <span className="bg-emerald-100 text-emerald-800 text-[10px] font-extrabold px-2 py-0.5 rounded-full border border-emerald-300">
+                      Auto-Notify
+                    </span>
+                  </h4>
+                  <p className="text-[11px] text-stone-600">
+                    Saree add hote hi registered customers ko high-conversion mail chala jayega.
+                  </p>
+                </div>
+              </div>
+              <label className="relative inline-flex items-center cursor-pointer shrink-0">
+                <input
+                  type="checkbox"
+                  checked={sendEmailBroadcast}
+                  onChange={(e) => setSendEmailBroadcast(e.target.checked)}
+                  className="sr-only peer"
+                />
+                <div className="w-11 h-6 bg-stone-300 peer-focus:outline-hidden rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-stone-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#800020]"></div>
+              </label>
+            </div>
+
+            {sendEmailBroadcast && (
+              <div className="space-y-3 pt-2 border-t border-amber-200/70">
+                <div>
+                  <label className="font-bold text-stone-800 text-xs flex items-center gap-1.5 mb-1.5">
+                    <Sparkles className="w-3.5 h-3.5 text-amber-600" />
+                    <span>Choose Catchy Email Tagline (आकर्षक टैगलाइन चुनें):</span>
+                  </label>
+                  <div className="space-y-1.5">
+                    {PRESET_TAGLINES.map((t, idx) => (
+                      <label
+                        key={idx}
+                        onClick={() => setSelectedTaglineIndex(idx)}
+                        className={`flex items-start gap-2 p-2 rounded-xl border text-xs cursor-pointer transition ${
+                          selectedTaglineIndex === idx
+                            ? 'bg-amber-100/90 border-[#800020] text-stone-900 font-semibold shadow-2xs'
+                            : 'bg-white/80 border-stone-200 text-stone-600 hover:bg-stone-50'
+                        }`}
+                      >
+                        <input
+                          type="radio"
+                          name="email_tagline"
+                          checked={selectedTaglineIndex === idx}
+                          onChange={() => setSelectedTaglineIndex(idx)}
+                          className="mt-0.5 text-[#800020]"
+                        />
+                        <span className="leading-snug">{t}</span>
+                      </label>
+                    ))}
+
+                    <label
+                      onClick={() => setSelectedTaglineIndex(-1)}
+                      className={`flex items-start gap-2 p-2 rounded-xl border text-xs cursor-pointer transition ${
+                        selectedTaglineIndex === -1
+                          ? 'bg-amber-100/90 border-[#800020] text-stone-900 font-semibold shadow-2xs'
+                          : 'bg-white/80 border-stone-200 text-stone-600 hover:bg-stone-50'
+                      }`}
+                    >
+                      <input
+                        type="radio"
+                        name="email_tagline"
+                        checked={selectedTaglineIndex === -1}
+                        onChange={() => setSelectedTaglineIndex(-1)}
+                        className="mt-0.5 text-[#800020]"
+                      />
+                      <span>✍️ Custom Tagline (Apni pasand ki line likhein)</span>
+                    </label>
+                  </div>
+                </div>
+
+                {selectedTaglineIndex === -1 && (
+                  <div className="pl-6">
+                    <input
+                      type="text"
+                      placeholder="e.g. Shaadi season ka sabse bada dhamaka — Viral Sarees ka naya roop!"
+                      value={customTagline}
+                      onChange={(e) => setCustomTagline(e.target.value)}
+                      className="w-full px-3 py-2 text-xs border border-amber-300 rounded-xl bg-white outline-hidden focus:ring-2 focus:ring-[#800020]"
+                    />
+                  </div>
+                )}
+
+                {/* Email Live Preview Banner */}
+                <div className="p-2.5 bg-stone-900 text-white rounded-xl text-[11px] flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Send className="w-3.5 h-3.5 text-amber-400" />
+                    <span>
+                      Recipients: <strong>All registered customers</strong> + Owner Gmail
+                    </span>
+                  </div>
+                  <span className="text-amber-300 font-mono text-[10px]">
+                    Gmail SMTP • Instant Dispatch
+                  </span>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Action buttons */}

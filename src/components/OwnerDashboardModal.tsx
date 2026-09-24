@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
-import { X, Plus, Crown, Package, Trash2, CheckCircle2, AlertTriangle, LogOut, ShieldCheck, Tag, ExternalLink, Film, Users, Phone, Mail, MapPin, Download, MessageCircle, ShoppingBag, Search, FileText, Truck, Edit3, Check, Share2, Copy, Sparkles, Globe, Info, UploadCloud, RefreshCw } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { X, Plus, Crown, Package, Trash2, CheckCircle2, AlertTriangle, LogOut, ShieldCheck, Tag, ExternalLink, Film, Users, Phone, Mail, MapPin, Download, MessageCircle, ShoppingBag, Search, FileText, Truck, Edit3, Check, Share2, Copy, Sparkles, Globe, Info, UploadCloud, RefreshCw, FileSpreadsheet, Send, Layers, Clock } from 'lucide-react';
 import { Saree, OwnerSession, CustomerProfile, Order } from '../types';
 import { getPublicStoreUrl, getCustomerWhatsAppShareMessage } from '../utils/shareUrl';
 import { STORE_CONFIG } from '../data/storeConfig';
 import { syncLocalSareesToCloud } from '../services/catalogueService';
-import { syncLocalOrdersToCloud } from '../services/orderService';
+import { syncLocalOrdersToCloud, CustomerLoginRecord, fetchCustomerLoginsFromCloud } from '../services/orderService';
+import { broadcastNewCatalogueEmail } from '../services/catalogueBroadcastService';
 import { EditSareeModal } from './EditSareeModal';
 import { ShiprocketDispatchModal } from './ShiprocketDispatchModal';
 import { SHIPROCKET_COURIERS, getShiprocketConfig } from '../services/shiprocketService';
@@ -44,7 +45,11 @@ export const OwnerDashboardModal: React.FC<OwnerDashboardModalProps> = ({
   onViewInvoice,
   onRefreshOrdersFromCloud
 }) => {
-  const [activeTab, setActiveTab] = useState<'inventory' | 'customers' | 'orders' | 'shiprocket'>('inventory');
+  const [activeTab, setActiveTab] = useState<'inventory' | 'customers' | 'orders' | 'shiprocket' | 'excel_ledger'>('inventory');
+  const [excelSubSheet, setExcelSubSheet] = useState<'customers' | 'orders' | 'logins'>('customers');
+  const [customerLogins, setCustomerLogins] = useState<CustomerLoginRecord[]>([]);
+  const [isBroadcasting, setIsBroadcasting] = useState<string | null>(null);
+  const [broadcastNotice, setBroadcastNotice] = useState<string | null>(null);
   const [searchFilter, setSearchFilter] = useState('');
   const [customerSearch, setCustomerSearch] = useState('');
   const [editingAwbOrderId, setEditingAwbOrderId] = useState<string | null>(null);
@@ -57,6 +62,14 @@ export const OwnerDashboardModal: React.FC<OwnerDashboardModalProps> = ({
   const [isRefreshingOrders, setIsRefreshingOrders] = useState(false);
   const [orderSyncSuccess, setOrderSyncSuccess] = useState<string | null>(null);
   const [selectedOrderForShiprocket, setSelectedOrderForShiprocket] = useState<Order | null>(null);
+
+  useEffect(() => {
+    if (activeTab === 'excel_ledger') {
+      fetchCustomerLoginsFromCloud().then((data) => {
+        if (data && data.length > 0) setCustomerLogins(data);
+      });
+    }
+  }, [activeTab]);
 
   const handleSyncOrdersToCloud = async () => {
     setIsSyncingOrders(true);
@@ -112,8 +125,9 @@ export const OwnerDashboardModal: React.FC<OwnerDashboardModalProps> = ({
   // Export Customer Contacts to CSV for Excel / Phone Contacts
   const handleExportCSV = () => {
     if (customers.length === 0) return;
-    const headers = ['Customer Name', 'Phone Number', 'Email', 'City', 'State', 'Pincode', 'Street Address', 'Total Orders', 'Total Spent (INR)', 'Registered Date', 'Last Active'];
+    const headers = ['Customer ID', 'Customer Name', 'Phone Number', 'Email', 'City', 'State', 'Pincode', 'Street Address', 'Total Orders', 'Total Spent (INR)', 'Registered Date', 'Last Active'];
     const rows = customers.map((c) => [
+      `"${c.id}"`,
       `"${c.name.replace(/"/g, '""')}"`,
       `"${c.phone}"`,
       `"${c.email || ''}"`,
@@ -127,14 +141,253 @@ export const OwnerDashboardModal: React.FC<OwnerDashboardModalProps> = ({
       `"${c.lastLoginAt}"`
     ]);
 
-    const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map((e) => e.join(','))].join('\n');
-    const encodedUri = encodeURI(csvContent);
+    const csvContent = '\uFEFF' + [headers.join(','), ...rows.map((e) => e.join(','))].join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
-    link.setAttribute('href', encodedUri);
-    link.setAttribute('download', `Viral_Sarees_Customers_${new Date().toISOString().slice(0, 10)}.csv`);
+    link.href = url;
+    link.download = `Viral_Sarees_Customers_Master_${new Date().toISOString().slice(0, 10)}.csv`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
+  // Export Complete Orders Ledger for Microsoft Excel / Google Sheets
+  const handleExportExcelOrders = () => {
+    if (orders.length === 0) return;
+    const headers = [
+      'Order ID',
+      'Date & Time',
+      'Customer Name',
+      'Mobile Number',
+      'Email Address',
+      'City',
+      'State',
+      'Pincode',
+      'Full Shipping Address',
+      'Items Ordered',
+      'Total Saree Quantity',
+      'Payment Method',
+      'Payment Status',
+      'Order Status',
+      'Subtotal (INR)',
+      'Discount (INR)',
+      'Total Amount (INR)',
+      'Courier Partner',
+      'Tracking Number (AWB)'
+    ];
+
+    const rows = orders.map((o) => {
+      const itemsDesc = o.items.map((it) => `${it.saree.title} (x${it.quantity})`).join('; ');
+      const totalQty = o.items.reduce((sum, it) => sum + (it.quantity || 1), 0);
+      return [
+        `"${o.id}"`,
+        `"${o.orderDate}"`,
+        `"${(o.customerName || '').replace(/"/g, '""')}"`,
+        `"${o.phone || ''}"`,
+        `"${o.email || ''}"`,
+        `"${o.shippingAddress?.city || ''}"`,
+        `"${o.shippingAddress?.state || ''}"`,
+        `"${o.shippingAddress?.pincode || ''}"`,
+        `"${((o.shippingAddress?.street || '') + ', ' + (o.shippingAddress?.landmark || '')).replace(/"/g, '""')}"`,
+        `"${itemsDesc.replace(/"/g, '""')}"`,
+        totalQty,
+        `"${o.paymentMethod}"`,
+        `"${o.paymentStatus}"`,
+        `"${o.orderStatus}"`,
+        o.subtotal || o.totalAmount,
+        o.discount || 0,
+        o.totalAmount,
+        `"${o.courierName || 'Pending'}"`,
+        `"${o.trackingNumber || ''}"`
+      ];
+    });
+
+    const csvContent = '\uFEFF' + [headers.join(','), ...rows.map((e) => e.join(','))].join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `Viral_Sarees_Orders_Sales_Ledger_${new Date().toISOString().slice(0, 10)}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
+  // Export Customer Logins Ledger
+  const handleExportExcelLogins = () => {
+    if (customerLogins.length === 0) return;
+    const headers = ['Login ID', 'Login Date & Time', 'Customer Name', 'Email Address', 'Mobile Number', 'City', 'Pincode'];
+    const rows = customerLogins.map((l) => [
+      `"${l.id}"`,
+      `"${l.loginDate}"`,
+      `"${(l.name || '').replace(/"/g, '""')}"`,
+      `"${l.email || ''}"`,
+      `"${l.phone || ''}"`,
+      `"${l.city || ''}"`,
+      `"${l.pincode || ''}"`
+    ]);
+
+    const csvContent = '\uFEFF' + [headers.join(','), ...rows.map((e) => e.join(','))].join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `Viral_Sarees_Customer_Logins_${new Date().toISOString().slice(0, 10)}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
+  const [sheetCopiedNotice, setSheetCopiedNotice] = useState<string | null>(null);
+
+  // Copy current sheet data formatted as Tab-Separated Values (TSV) directly to clipboard
+  // so the owner can press Ctrl+V in Google Sheets or Excel and it pastes into columns and rows!
+  const handleCopySheetToClipboard = () => {
+    let tsvContent = '';
+    if (excelSubSheet === 'customers') {
+      const headers = ['Row', 'Customer Name', 'Phone Number', 'Email Address', 'City', 'Pincode', 'Orders', 'Total Spent (INR)', 'Registered Date', 'Last Active'];
+      const rows = filteredCustomers.map((c, i) => [
+        i + 1,
+        c.name,
+        `+91 ${c.phone}`,
+        c.email || '',
+        c.address?.city || '',
+        c.address?.pincode || '',
+        c.totalOrdersCount || 0,
+        c.totalSpent || 0,
+        c.registeredAt || '',
+        c.lastLoginAt || ''
+      ]);
+      tsvContent = [headers.join('\t'), ...rows.map((r) => r.join('\t'))].join('\n');
+    } else if (excelSubSheet === 'orders') {
+      const headers = ['Row', 'Order ID', 'Date & Time', 'Customer Name', 'Phone Number', 'Items Ordered', 'Payment Method', 'Order Status', 'Total Amount (INR)', 'Tracking AWB'];
+      const rows = orders.map((o, i) => [
+        i + 1,
+        o.id,
+        o.orderDate,
+        o.customerName,
+        `+91 ${o.phone}`,
+        o.items.map((it) => `${it.saree.title} (x${it.quantity})`).join(', '),
+        o.paymentMethod,
+        o.orderStatus,
+        o.totalAmount,
+        o.trackingNumber || 'Pending'
+      ]);
+      tsvContent = [headers.join('\t'), ...rows.map((r) => r.join('\t'))].join('\n');
+    } else {
+      const items = customerLogins.length > 0 ? customerLogins : customers;
+      const headers = ['Row', 'Customer Name', 'Email Address', 'Phone Number', 'City', 'Pincode', 'Login Timestamp'];
+      const rows = items.map((l: any, i: number) => [
+        i + 1,
+        l.name || 'Valued Customer',
+        l.email || '',
+        `+91 ${l.phone || ''}`,
+        l.city || l.address?.city || '',
+        l.pincode || l.address?.pincode || '',
+        l.loginDate || l.lastLoginAt || ''
+      ]);
+      tsvContent = [headers.join('\t'), ...rows.map((r) => r.join('\t'))].join('\n');
+    }
+
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(tsvContent).then(() => {
+        setSheetCopiedNotice('✅ Table copied to clipboard! Open Excel or Google Sheets and press Paste (Ctrl+V).');
+        setTimeout(() => setSheetCopiedNotice(null), 4000);
+      }).catch(() => {
+        setSheetCopiedNotice('Could not copy automatically. Please use the Download Excel button.');
+        setTimeout(() => setSheetCopiedNotice(null), 3000);
+      });
+    }
+  };
+
+  // Export Complete Master Workbook with all 3 sheets
+  const handleExportAllWorkbook = () => {
+    let combined = '\uFEFF=== VIRAL SAREES MASTER BUSINESS LEDGER ===\n';
+    combined += `Generated: ${new Date().toLocaleString('en-IN')}\n\n`;
+
+    // 1. ORDERS
+    combined += '--- SECTION 1: CUSTOMER ORDERS & REVENUE ---\n';
+    const orderHeaders = ['Order ID', 'Order Date', 'Customer Name', 'Phone', 'Email', 'City', 'State', 'Pincode', 'Address', 'Items', 'Qty', 'Payment', 'Status', 'Total (INR)'];
+    const orderRows = orders.map((o) => [
+      `"${o.id}"`,
+      `"${o.orderDate}"`,
+      `"${(o.customerName || '').replace(/"/g, '""')}"`,
+      `"${o.phone || ''}"`,
+      `"${o.email || ''}"`,
+      `"${o.shippingAddress?.city || ''}"`,
+      `"${o.shippingAddress?.state || ''}"`,
+      `"${o.shippingAddress?.pincode || ''}"`,
+      `"${((o.shippingAddress?.street || '') + ', ' + (o.shippingAddress?.landmark || '')).replace(/"/g, '""')}"`,
+      `"${o.items.map((it) => it.saree.title).join('; ').replace(/"/g, '""')}"`,
+      o.items.reduce((s, it) => s + (it.quantity || 1), 0),
+      `"${o.paymentMethod}"`,
+      `"${o.orderStatus}"`,
+      o.totalAmount
+    ]);
+    combined += [orderHeaders.join(','), ...orderRows.map((r) => r.join(','))].join('\n') + '\n\n';
+
+    // 2. CUSTOMERS
+    combined += '--- SECTION 2: REGISTERED CUSTOMERS DIRECTORY ---\n';
+    const custHeaders = ['Customer ID', 'Name', 'Phone', 'Email', 'City', 'Pincode', 'Orders', 'Spent (INR)', 'Registered At'];
+    const custRows = customers.map((c) => [
+      `"${c.id}"`,
+      `"${(c.name || '').replace(/"/g, '""')}"`,
+      `"${c.phone}"`,
+      `"${c.email || ''}"`,
+      `"${c.address?.city || ''}"`,
+      `"${c.address?.pincode || ''}"`,
+      c.totalOrdersCount || 0,
+      c.totalSpent || 0,
+      `"${c.registeredAt}"`
+    ]);
+    combined += [custHeaders.join(','), ...custRows.map((r) => r.join(','))].join('\n') + '\n\n';
+
+    // 3. LOGINS
+    combined += '--- SECTION 3: CUSTOMER LOGIN AUDIT LOG ---\n';
+    const loginItems = customerLogins.length > 0 ? customerLogins : customers;
+    const loginHeaders = ['Customer Name', 'Email', 'Phone', 'City', 'Pincode', 'Timestamp'];
+    const loginRows = loginItems.map((l: any) => [
+      `"${(l.name || '').replace(/"/g, '""')}"`,
+      `"${l.email || ''}"`,
+      `"${l.phone || ''}"`,
+      `"${l.city || l.address?.city || ''}"`,
+      `"${l.pincode || l.address?.pincode || ''}"`,
+      `"${l.loginDate || l.lastLoginAt || ''}"`
+    ]);
+    combined += [loginHeaders.join(','), ...loginRows.map((r) => r.join(','))].join('\n');
+
+    const blob = new Blob([combined], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `Viral_Sarees_Complete_Master_Workbook_${new Date().toISOString().slice(0, 10)}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
+  // Manual Trigger to Broadcast Saree Catalogue Email to All Customers
+  const handleBroadcastSaree = async (saree: Saree, customTagline?: string) => {
+    setIsBroadcasting(saree.id);
+    setBroadcastNotice(null);
+    try {
+      const res = await broadcastNewCatalogueEmail(saree, customers, customTagline);
+      if (res.success) {
+        setBroadcastNotice(`📢 Announcement email sent to ${res.sentCount} customer(s): "${saree.title}"!`);
+      } else {
+        setBroadcastNotice(res.message);
+      }
+    } catch (err: any) {
+      setBroadcastNotice(err?.message || 'Failed to dispatch email');
+    } finally {
+      setIsBroadcasting(null);
+      setTimeout(() => setBroadcastNotice(null), 6000);
+    }
   };
 
   const totalRevenue = orders.reduce((sum, o) => sum + (o.totalAmount || 0), 0);
@@ -249,6 +502,21 @@ export const OwnerDashboardModal: React.FC<OwnerDashboardModalProps> = ({
             <span>Shiprocket Logistics</span>
             <span className="px-1.5 py-0.2 rounded-full bg-blue-100 text-blue-800 text-[10px] font-bold">
               Tie-up
+            </span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('excel_ledger')}
+            className={`pb-3 px-3.5 border-b-2 flex items-center gap-2 transition cursor-pointer ${
+              activeTab === 'excel_ledger'
+                ? 'border-[#107c41] text-[#107c41] font-black'
+                : 'border-transparent text-emerald-800 hover:text-emerald-950 font-semibold'
+            }`}
+          >
+            <FileSpreadsheet className="w-4 h-4 text-[#107c41]" />
+            <span>Excel Sheet Ledger (Logins & Orders)</span>
+            <span className="px-1.5 py-0.2 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-extrabold">
+              LIVE XLSX
             </span>
           </button>
         </div>
@@ -400,6 +668,43 @@ export const OwnerDashboardModal: React.FC<OwnerDashboardModalProps> = ({
               </button>
             </div>
 
+            {/* Broadcast Notice or Cloud Sync Notice */}
+            {broadcastNotice && (
+              <div className="p-3 bg-amber-50 border border-amber-300 text-amber-900 rounded-xl font-medium text-xs flex items-center gap-2 animate-fadeIn">
+                <Sparkles className="w-4 h-4 text-amber-600 shrink-0" />
+                <span>{broadcastNotice}</span>
+              </div>
+            )}
+
+            {/* Automated Customer Email Launch Banner */}
+            <div className="p-3.5 bg-gradient-to-r from-amber-50 via-rose-50/50 to-white border border-amber-300/80 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs shadow-2xs">
+              <div className="flex items-start gap-2.5">
+                <div className="w-8 h-8 rounded-xl bg-[#800020] text-amber-200 flex items-center justify-center font-bold text-sm shrink-0 shadow-xs">
+                  ✉️
+                </div>
+                <div>
+                  <span className="font-bold text-stone-900 flex items-center gap-1.5">
+                    <span>Auto-Email Launch to Customers Active</span>
+                    <span className="text-[10px] bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full font-bold">Enabled</span>
+                  </span>
+                  <p className="text-[11px] text-stone-600 mt-0.5 leading-relaxed">
+                    Naya saree catalogue publish karte hi sabhi registered customers ke email par attractive photo, special discount aur purchase link ke sath professional mail automatically chala jata hai.
+                  </p>
+                </div>
+              </div>
+              {sarees.length > 0 && (
+                <button
+                  type="button"
+                  onClick={() => handleBroadcastSaree(sarees[0])}
+                  disabled={isBroadcasting === sarees[0]?.id}
+                  className="px-3.5 py-2 bg-[#800020] hover:bg-[#9B111E] text-amber-100 font-bold rounded-xl text-xs flex items-center gap-1.5 transition cursor-pointer shadow-xs shrink-0 self-start sm:self-auto"
+                >
+                  <Send className={`w-3.5 h-3.5 ${isBroadcasting === sarees[0]?.id ? 'animate-spin' : ''}`} />
+                  <span>{isBroadcasting === sarees[0]?.id ? 'Broadcasting...' : 'Broadcast Latest Saree'}</span>
+                </button>
+              )}
+            </div>
+
             {cloudSyncSuccess && (
               <div className="p-3 bg-emerald-50 border border-emerald-300 text-emerald-800 rounded-xl font-medium text-xs flex items-center gap-2 animate-fadeIn">
                 <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
@@ -503,6 +808,18 @@ export const OwnerDashboardModal: React.FC<OwnerDashboardModalProps> = ({
 
                           <td className="p-3 text-right">
                             <div className="flex items-center justify-end gap-1.5">
+                              <button
+                                type="button"
+                                onClick={() => handleBroadcastSaree(saree)}
+                                disabled={isBroadcasting === saree.id}
+                                className="p-1.5 text-rose-800 hover:text-white hover:bg-[#800020] rounded-lg transition cursor-pointer flex items-center gap-1 text-xs font-bold border border-rose-300"
+                                title="Broadcast launch email for this saree to registered customers"
+                              >
+                                <Send className={`w-3.5 h-3.5 ${isBroadcasting === saree.id ? 'animate-spin' : ''}`} />
+                                <span className="hidden sm:inline">
+                                  {isBroadcasting === saree.id ? 'Sending...' : 'Email Alert'}
+                                </span>
+                              </button>
                               <button
                                 onClick={() => setEditingSaree(saree)}
                                 className="p-1.5 text-stone-600 hover:text-amber-800 hover:bg-amber-100 rounded-lg transition cursor-pointer flex items-center gap-1 text-xs font-bold border border-stone-200"
@@ -1066,6 +1383,387 @@ export const OwnerDashboardModal: React.FC<OwnerDashboardModalProps> = ({
                 <li>Pickup manifests are generated daily at 4:30 PM for all BlueDart, Delhivery, DTDC, and XpressBees consignments.</li>
               </ul>
             </div>
+          </div>
+        )}
+
+        {/* Tab 5: Real-Time Excel Sheet Ledger (Logins, Customers & Orders) */}
+        {activeTab === 'excel_ledger' && (
+          <div className="overflow-y-auto p-4 sm:p-6 flex-1 space-y-4 text-xs font-sans">
+            
+            {/* Excel Header Ribbon */}
+            <div className="bg-[#107c41] text-white rounded-2xl p-4 sm:p-5 shadow-md border border-[#0d6133] flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <div className="w-11 h-11 rounded-xl bg-white/15 border border-white/25 flex items-center justify-center text-white shrink-0">
+                  <FileSpreadsheet className="w-6 h-6" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <h4 className="font-mono font-bold text-base tracking-wide flex items-center gap-1.5">
+                      <span>Viral_Sarees_Master_Ledger.xlsx</span>
+                    </h4>
+                    <span className="bg-emerald-300 text-emerald-950 font-extrabold text-[10px] px-2 py-0.5 rounded-full uppercase tracking-wider">
+                      Live Cloud Sync
+                    </span>
+                  </div>
+                  <p className="text-emerald-100 text-[11px] mt-0.5">
+                    Customer logins aur orders automatically save hote hain. Aap 1-click me pura data Microsoft Excel ya Google Sheets me download kar sakte hain.
+                  </p>
+                </div>
+              </div>
+
+              {/* Action buttons */}
+              <div className="flex flex-wrap items-center gap-2 shrink-0">
+                <button
+                  type="button"
+                  onClick={handleCopySheetToClipboard}
+                  className="px-3.5 py-2 bg-emerald-900/60 hover:bg-emerald-900 text-white font-bold rounded-xl transition flex items-center gap-1.5 border border-emerald-400/40 shadow-xs cursor-pointer active:scale-95 text-xs"
+                  title="Copy formatted table to paste directly into Excel or Google Sheets (Ctrl+V)"
+                >
+                  <Copy className="w-4 h-4 text-emerald-300" />
+                  <span>Copy Table (Paste in Excel)</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (excelSubSheet === 'customers') handleExportCSV();
+                    else if (excelSubSheet === 'orders') handleExportExcelOrders();
+                    else handleExportExcelLogins();
+                  }}
+                  className="px-3.5 py-2 bg-white text-[#107c41] hover:bg-emerald-50 font-extrabold rounded-xl transition flex items-center gap-1.5 shadow-xs cursor-pointer active:scale-95 text-xs"
+                >
+                  <Download className="w-4 h-4 text-[#107c41]" />
+                  <span>
+                    Download {excelSubSheet === 'customers' ? 'Customers' : excelSubSheet === 'orders' ? 'Orders' : 'Logins'} (.xlsx / .csv)
+                  </span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleExportAllWorkbook}
+                  className="px-3 py-2 bg-amber-400 hover:bg-amber-300 text-amber-950 font-black rounded-xl transition flex items-center gap-1.5 shadow-xs cursor-pointer active:scale-95 text-xs"
+                  title="Download All 3 Sheets in One Unified Workbook"
+                >
+                  <Download className="w-4 h-4 text-amber-900" />
+                  <span>Download Master Workbook</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    fetchCustomerLoginsFromCloud().then((data) => {
+                      if (data && data.length > 0) setCustomerLogins(data);
+                    });
+                    if (onRefreshOrdersFromCloud) onRefreshOrdersFromCloud();
+                  }}
+                  className="p-2 bg-white/15 hover:bg-white/25 text-white rounded-xl transition cursor-pointer"
+                  title="Refresh Cloud Ledger"
+                >
+                  <RefreshCw className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+
+            {sheetCopiedNotice && (
+              <div className="p-3 bg-emerald-50 border border-emerald-400 text-emerald-900 font-bold rounded-xl flex items-center gap-2 text-xs animate-fadeIn">
+                <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                <span>{sheetCopiedNotice}</span>
+              </div>
+            )}
+
+            {/* Excel Sub-Sheets Navigation */}
+            <div className="flex flex-wrap items-center justify-between gap-3 bg-stone-100 p-2 rounded-2xl border border-stone-200">
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <button
+                  type="button"
+                  onClick={() => setExcelSubSheet('customers')}
+                  className={`px-3.5 py-1.5 rounded-xl font-bold transition flex items-center gap-1.5 cursor-pointer text-xs ${
+                    excelSubSheet === 'customers'
+                      ? 'bg-[#107c41] text-white shadow-xs'
+                      : 'bg-white text-stone-700 hover:bg-stone-200 border border-stone-300'
+                  }`}
+                >
+                  <Users className="w-3.5 h-3.5" />
+                  <span>Sheet 1: Customers Directory ({customers.length})</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setExcelSubSheet('orders')}
+                  className={`px-3.5 py-1.5 rounded-xl font-bold transition flex items-center gap-1.5 cursor-pointer text-xs ${
+                    excelSubSheet === 'orders'
+                      ? 'bg-[#107c41] text-white shadow-xs'
+                      : 'bg-white text-stone-700 hover:bg-stone-200 border border-stone-300'
+                  }`}
+                >
+                  <ShoppingBag className="w-3.5 h-3.5" />
+                  <span>Sheet 2: Orders & Sales Ledger ({orders.length})</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setExcelSubSheet('logins')}
+                  className={`px-3.5 py-1.5 rounded-xl font-bold transition flex items-center gap-1.5 cursor-pointer text-xs ${
+                    excelSubSheet === 'logins'
+                      ? 'bg-[#107c41] text-white shadow-xs'
+                      : 'bg-white text-stone-700 hover:bg-stone-200 border border-stone-300'
+                  }`}
+                >
+                  <Clock className="w-3.5 h-3.5" />
+                  <span>Sheet 3: Real-Time Login Audit ({customerLogins.length || customers.length})</span>
+                </button>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <input
+                  type="text"
+                  placeholder="Filter active sheet..."
+                  value={customerSearch}
+                  onChange={(e) => setCustomerSearch(e.target.value)}
+                  className="px-3 py-1.5 bg-white border border-stone-300 rounded-xl text-xs w-48 sm:w-56 focus:outline-emerald-600 font-sans"
+                />
+              </div>
+            </div>
+
+            {/* SHEET 1: Customers Directory Table */}
+            {excelSubSheet === 'customers' && (
+              <div className="border border-stone-300 rounded-xl overflow-hidden bg-white shadow-xs">
+                <div className="overflow-x-auto max-h-[50vh]">
+                  <table className="w-full text-left border-collapse font-sans text-xs">
+                    <thead>
+                      <tr className="bg-[#f3f4f6] border-b border-stone-300 text-stone-500 font-mono text-[10px] text-center">
+                        <th className="p-2 border-r border-stone-300 w-12 bg-stone-200/80">#</th>
+                        <th className="p-2 border-r border-stone-300">A</th>
+                        <th className="p-2 border-r border-stone-300">B</th>
+                        <th className="p-2 border-r border-stone-300">C</th>
+                        <th className="p-2 border-r border-stone-300">D</th>
+                        <th className="p-2 border-r border-stone-300">E</th>
+                        <th className="p-2 border-r border-stone-300">F</th>
+                        <th className="p-2 border-r border-stone-300">G</th>
+                        <th className="p-2 border-r border-stone-300">H</th>
+                        <th className="p-2">I</th>
+                      </tr>
+                      <tr className="bg-[#e5e7eb] border-b-2 border-stone-400 font-bold text-stone-800 text-[11px]">
+                        <th className="p-2.5 border-r border-stone-300 text-center w-12 font-mono bg-stone-300/80">Row</th>
+                        <th className="p-2.5 border-r border-stone-300 min-w-[140px]">Customer Name</th>
+                        <th className="p-2.5 border-r border-stone-300 min-w-[120px]">Phone Number</th>
+                        <th className="p-2.5 border-r border-stone-300 min-w-[180px]">Email Address</th>
+                        <th className="p-2.5 border-r border-stone-300 min-w-[120px]">City</th>
+                        <th className="p-2.5 border-r border-stone-300 min-w-[80px]">Pincode</th>
+                        <th className="p-2.5 border-r border-stone-300 text-center min-w-[90px]">Orders</th>
+                        <th className="p-2.5 border-r border-stone-300 text-right min-w-[110px]">Total Spent</th>
+                        <th className="p-2.5 border-r border-stone-300 min-w-[110px]">Registered Date</th>
+                        <th className="p-2.5 min-w-[130px]">Last Login</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-stone-200">
+                      {filteredCustomers.length === 0 ? (
+                        <tr>
+                          <td colSpan={10} className="p-8 text-center text-stone-500">
+                            No customers found in ledger. When customers log in or place orders, their data appears here instantly.
+                          </td>
+                        </tr>
+                      ) : (
+                        filteredCustomers.map((cust, idx) => (
+                          <tr key={cust.id} className="hover:bg-emerald-50/50 transition font-sans even:bg-stone-50/60">
+                            <td className="p-2 border-r border-stone-200 text-center font-mono text-[10px] text-stone-400 bg-stone-100/70 select-none">
+                              {idx + 1}
+                            </td>
+                            <td className="p-2 border-r border-stone-200 font-semibold text-stone-900">
+                              {cust.name}
+                            </td>
+                            <td className="p-2 border-r border-stone-200 font-mono text-stone-700">
+                              +91 {cust.phone}
+                            </td>
+                            <td className="p-2 border-r border-stone-200 text-stone-600 font-mono text-[11px]">
+                              {cust.email || '—'}
+                            </td>
+                            <td className="p-2 border-r border-stone-200 text-stone-700">
+                              {cust.address?.city || '—'}
+                            </td>
+                            <td className="p-2 border-r border-stone-200 font-mono text-stone-700">
+                              {cust.address?.pincode || '—'}
+                            </td>
+                            <td className="p-2 border-r border-stone-200 text-center font-mono font-bold text-stone-800">
+                              {cust.totalOrdersCount || 0}
+                            </td>
+                            <td className="p-2 border-r border-stone-200 text-right font-mono font-bold text-emerald-800">
+                              ₹{(cust.totalSpent || 0).toLocaleString('en-IN')}
+                            </td>
+                            <td className="p-2 border-r border-stone-200 text-stone-500 text-[11px]">
+                              {cust.registeredAt || '—'}
+                            </td>
+                            <td className="p-2 text-stone-600 text-[11px]">
+                              {cust.lastLoginAt || '—'}
+                            </td>
+                          </tr>
+                        ))
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+
+            {/* SHEET 2: Orders & Sales Ledger Table */}
+            {excelSubSheet === 'orders' && (
+              <div className="border border-stone-300 rounded-xl overflow-hidden bg-white shadow-xs">
+                <div className="overflow-x-auto max-h-[50vh]">
+                  <table className="w-full text-left border-collapse font-sans text-xs">
+                    <thead>
+                      <tr className="bg-[#f3f4f6] border-b border-stone-300 text-stone-500 font-mono text-[10px] text-center">
+                        <th className="p-2 border-r border-stone-300 w-12 bg-stone-200/80">#</th>
+                        <th className="p-2 border-r border-stone-300">A</th>
+                        <th className="p-2 border-r border-stone-300">B</th>
+                        <th className="p-2 border-r border-stone-300">C</th>
+                        <th className="p-2 border-r border-stone-300">D</th>
+                        <th className="p-2 border-r border-stone-300">E</th>
+                        <th className="p-2 border-r border-stone-300">F</th>
+                        <th className="p-2 border-r border-stone-300">G</th>
+                        <th className="p-2 border-r border-stone-300">H</th>
+                        <th className="p-2">I</th>
+                      </tr>
+                      <tr className="bg-[#e5e7eb] border-b-2 border-stone-400 font-bold text-stone-800 text-[11px]">
+                        <th className="p-2.5 border-r border-stone-300 text-center w-12 font-mono bg-stone-300/80">Row</th>
+                        <th className="p-2.5 border-r border-stone-300 min-w-[120px]">Order ID</th>
+                        <th className="p-2.5 border-r border-stone-300 min-w-[130px]">Date</th>
+                        <th className="p-2.5 border-r border-stone-300 min-w-[130px]">Customer Name</th>
+                        <th className="p-2.5 border-r border-stone-300 min-w-[110px]">Phone</th>
+                        <th className="p-2.5 border-r border-stone-300 min-w-[180px]">Items Ordered</th>
+                        <th className="p-2.5 border-r border-stone-300 min-w-[90px]">Payment</th>
+                        <th className="p-2.5 border-r border-stone-300 min-w-[100px]">Status</th>
+                        <th className="p-2.5 border-r border-stone-300 text-right min-w-[100px]">Amount (₹)</th>
+                        <th className="p-2.5 min-w-[110px]">AWB / Tracking</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-stone-200">
+                      {orders.length === 0 ? (
+                        <tr>
+                          <td colSpan={10} className="p-8 text-center text-stone-500">
+                            No orders placed yet. Orders will appear here with full customer delivery and payment details.
+                          </td>
+                        </tr>
+                      ) : (
+                        orders.map((ord, idx) => (
+                          <tr key={ord.id} className="hover:bg-emerald-50/50 transition font-sans even:bg-stone-50/60">
+                            <td className="p-2 border-r border-stone-200 text-center font-mono text-[10px] text-stone-400 bg-stone-100/70 select-none">
+                              {idx + 1}
+                            </td>
+                            <td className="p-2 border-r border-stone-200 font-mono font-bold text-stone-900">
+                              {ord.id}
+                            </td>
+                            <td className="p-2 border-r border-stone-200 text-stone-600 text-[11px]">
+                              {ord.orderDate}
+                            </td>
+                            <td className="p-2 border-r border-stone-200 font-semibold text-stone-900">
+                              {ord.customerName}
+                            </td>
+                            <td className="p-2 border-r border-stone-200 font-mono text-stone-700">
+                              +91 {ord.phone}
+                            </td>
+                            <td className="p-2 border-r border-stone-200 text-stone-700 text-[11px] truncate max-w-[200px]">
+                              {ord.items.map((it) => `${it.saree.title} (x${it.quantity})`).join(', ')}
+                            </td>
+                            <td className="p-2 border-r border-stone-200 text-stone-700">
+                              <span className="px-1.5 py-0.5 rounded bg-stone-100 font-mono text-[10px]">
+                                {ord.paymentMethod}
+                              </span>
+                            </td>
+                            <td className="p-2 border-r border-stone-200">
+                              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-900">
+                                {ord.orderStatus}
+                              </span>
+                            </td>
+                            <td className="p-2 border-r border-stone-200 text-right font-mono font-bold text-emerald-800">
+                              ₹{ord.totalAmount.toLocaleString('en-IN')}
+                            </td>
+                            <td className="p-2 font-mono text-[11px] text-stone-600">
+                              {ord.trackingNumber || 'Pending'}
+                            </td>
+                          </tr>
+                        ))
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+
+            {/* SHEET 3: Real-Time Customer Logins Table */}
+            {excelSubSheet === 'logins' && (
+              <div className="border border-stone-300 rounded-xl overflow-hidden bg-white shadow-xs">
+                <div className="overflow-x-auto max-h-[50vh]">
+                  <table className="w-full text-left border-collapse font-sans text-xs">
+                    <thead>
+                      <tr className="bg-[#f3f4f6] border-b border-stone-300 text-stone-500 font-mono text-[10px] text-center">
+                        <th className="p-2 border-r border-stone-300 w-12 bg-stone-200/80">#</th>
+                        <th className="p-2 border-r border-stone-300">A</th>
+                        <th className="p-2 border-r border-stone-300">B</th>
+                        <th className="p-2 border-r border-stone-300">C</th>
+                        <th className="p-2 border-r border-stone-300">D</th>
+                        <th className="p-2 border-r border-stone-300">E</th>
+                        <th className="p-2">F</th>
+                      </tr>
+                      <tr className="bg-[#e5e7eb] border-b-2 border-stone-400 font-bold text-stone-800 text-[11px]">
+                        <th className="p-2.5 border-r border-stone-300 text-center w-12 font-mono bg-stone-300/80">Row</th>
+                        <th className="p-2.5 border-r border-stone-300 min-w-[140px]">Customer Name</th>
+                        <th className="p-2.5 border-r border-stone-300 min-w-[180px]">Email Address</th>
+                        <th className="p-2.5 border-r border-stone-300 min-w-[120px]">Phone Number</th>
+                        <th className="p-2.5 border-r border-stone-300 min-w-[120px]">City</th>
+                        <th className="p-2.5 border-r border-stone-300 min-w-[90px]">Pincode</th>
+                        <th className="p-2.5 min-w-[150px]">Login Timestamp</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-stone-200">
+                      {(customerLogins.length > 0 ? customerLogins : customers).map((item: any, idx) => (
+                        <tr key={item.id || idx} className="hover:bg-emerald-50/50 transition font-sans even:bg-stone-50/60">
+                          <td className="p-2 border-r border-stone-200 text-center font-mono text-[10px] text-stone-400 bg-stone-100/70 select-none">
+                            {idx + 1}
+                          </td>
+                          <td className="p-2 border-r border-stone-200 font-semibold text-stone-900">
+                            {item.name || 'Valued Customer'}
+                          </td>
+                          <td className="p-2 border-r border-stone-200 font-mono text-[11px] text-stone-600">
+                            {item.email || '—'}
+                          </td>
+                          <td className="p-2 border-r border-stone-200 font-mono text-stone-700">
+                            +91 {item.phone || '—'}
+                          </td>
+                          <td className="p-2 border-r border-stone-200 text-stone-700">
+                            {item.city || item.address?.city || '—'}
+                          </td>
+                          <td className="p-2 border-r border-stone-200 font-mono text-stone-700">
+                            {item.pincode || item.address?.pincode || '—'}
+                          </td>
+                          <td className="p-2 text-stone-600 text-[11px] font-mono">
+                            {item.loginDate || item.lastLoginAt || 'Recent'}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+
+            {/* Excel Status Footer Bar */}
+            <div className="bg-stone-200/90 text-stone-700 px-4 py-2 rounded-xl flex flex-wrap items-center justify-between text-[11px] font-mono border border-stone-300">
+              <div className="flex items-center gap-3">
+                <span className="font-bold text-[#107c41]">READY</span>
+                <span>•</span>
+                <span>Active Sheet: {excelSubSheet.toUpperCase()}</span>
+                <span>•</span>
+                <span>Total Customers: {customers.length}</span>
+                <span>•</span>
+                <span>Total Orders: {orders.length}</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <span className="font-bold text-stone-900">Total Sales Sum: ₹{totalRevenue.toLocaleString('en-IN')}</span>
+                <span>•</span>
+                <span className="text-emerald-800 font-bold">Cloud Firestore: Online 🟢</span>
+              </div>
+            </div>
+
           </div>
         )}
 
