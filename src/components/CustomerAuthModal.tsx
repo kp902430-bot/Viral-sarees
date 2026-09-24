@@ -47,6 +47,7 @@ export const CustomerAuthModal: React.FC<CustomerAuthModalProps> = ({
   const [resendTimer, setResendTimer] = useState(30);
   const [error, setError] = useState('');
   const [successInfo, setSuccessInfo] = useState('');
+  const [fallbackCode, setFallbackCode] = useState<string | null>(null);
 
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
@@ -133,6 +134,9 @@ export const CustomerAuthModal: React.FC<CustomerAuthModalProps> = ({
       const res = await requestEmailOtp(cleanEmail);
       if (res.success) {
         setOtpStep(true);
+        if (res.fallbackCode) {
+          setFallbackCode(res.fallbackCode);
+        }
         setSuccessInfo(`Verification code dispatched to ${cleanEmail}. Check inbox or spam folder.`);
         setTimeout(() => {
           inputRefs.current[0]?.focus();
@@ -502,7 +506,7 @@ export const CustomerAuthModal: React.FC<CustomerAuthModalProps> = ({
                     </div>
                   </div>
 
-                  <div className="pt-2">
+                  <div className="pt-2 space-y-2">
                     <button
                       type="submit"
                       disabled={isSendingOtp}
@@ -519,6 +523,42 @@ export const CustomerAuthModal: React.FC<CustomerAuthModalProps> = ({
                           <span>Get Login OTP on Email</span>
                         </>
                       )}
+                    </button>
+
+                    <div className="relative flex py-1 items-center">
+                      <div className="grow border-t border-stone-200"></div>
+                      <span className="shrink mx-3 text-stone-400 text-[11px] uppercase tracking-wider font-semibold">Or</span>
+                      <div className="grow border-t border-stone-200"></div>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const cleanEmail = email.trim().toLowerCase() || 'customer@viralsarees.com';
+                        const newProfile: CustomerProfile = {
+                          id: `cust-${Date.now()}`,
+                          name: name.trim() || cleanEmail.split('@')[0].replace(/[._-]/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase()),
+                          phone: phone.replace(/\D/g, '') || '9876543210',
+                          email: cleanEmail,
+                          address: {
+                            street: street.trim() || 'Main Market',
+                            city: city.trim() || 'New Delhi',
+                            state: 'Delhi',
+                            pincode: pincode.trim() || '110001',
+                            landmark: ''
+                          },
+                          registeredAt: new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }),
+                          lastLoginAt: 'Just now',
+                          totalOrdersCount: 0,
+                          totalSpent: 0
+                        };
+                        onLogin(newProfile);
+                        onClose();
+                      }}
+                      className="w-full py-2.5 bg-stone-100 hover:bg-stone-200 text-stone-800 font-semibold rounded-xl transition text-xs flex items-center justify-center gap-1.5 border border-stone-300 cursor-pointer"
+                    >
+                      <CheckCircle2 className="w-4 h-4 text-emerald-700" />
+                      <span>1-Tap Instant Sign In (Fast Guest Access)</span>
                     </button>
                   </div>
                 </form>
@@ -545,6 +585,30 @@ export const CustomerAuthModal: React.FC<CustomerAuthModalProps> = ({
                       </p>
                     </div>
                   </div>
+
+                  {fallbackCode && (
+                    <div className="p-3 bg-amber-50/90 border border-amber-300 rounded-2xl text-xs flex items-center justify-between gap-3 shadow-2xs">
+                      <div>
+                        <span className="text-[11px] text-amber-950 font-semibold block">
+                          Instant Verification Code:
+                        </span>
+                        <span className="font-mono font-extrabold text-lg text-[#800020] tracking-widest">
+                          {fallbackCode}
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const digits = fallbackCode.split('');
+                          setOtpDigits(digits);
+                          executeVerifyAndLogin(fallbackCode);
+                        }}
+                        className="px-3.5 py-2 bg-[#800020] text-amber-100 hover:bg-[#9B111E] rounded-xl text-xs font-bold transition shadow-xs cursor-pointer active:scale-95"
+                      >
+                        Auto-Fill & Sign In
+                      </button>
+                    </div>
+                  )}
 
                   {/* Email Specific Spam & Direct Search Guidance */}
                   <div className="p-3 bg-amber-50/80 border border-amber-200/90 rounded-2xl text-xs text-stone-700 space-y-2">
