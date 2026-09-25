@@ -273,14 +273,14 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                 <div className="flex items-center justify-between gap-1">
                   <span className="font-bold text-[11px] text-amber-950 flex items-center gap-1.5">
                     <Lock className="w-3.5 h-3.5 text-amber-700 shrink-0" />
-                    <span>Cash on Delivery (COD) Notice:</span>
+                    <span>Cash on Delivery (COD) Policy:</span>
                   </span>
                   <span className="text-[9px] bg-rose-100 text-rose-900 font-bold px-1.5 py-0.5 rounded">
-                    Login Needed
+                    Requires Account
                   </span>
                 </div>
                 <p className="text-[10px] text-stone-600 leading-snug">
-                  COD keval verified Email se login karne par hi uplabdh hoga. Bina login ke keval <strong>Advance Online Payment</strong> se order book hoga.
+                  Cash on Delivery (COD) is available exclusively for verified accounts. Guest checkout requires advance online payment.
                 </p>
                 {onOpenCustomerAuth && (
                   <button
@@ -289,7 +289,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                     className="w-full py-1.5 px-2 bg-gradient-to-r from-amber-600 to-[#800020] hover:opacity-95 text-white rounded-lg text-[10px] font-bold flex items-center justify-center gap-1.5 transition cursor-pointer shadow-2xs"
                   >
                     <Mail className="w-3 h-3 text-amber-200" />
-                    <span>Email OTP Login Karein (COD Unlock Karein)</span>
+                    <span>Sign In with Email (Unlock COD)</span>
                   </button>
                 )}
               </div>

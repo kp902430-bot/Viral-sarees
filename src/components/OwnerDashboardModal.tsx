@@ -565,79 +565,62 @@ export const OwnerDashboardModal: React.FC<OwnerDashboardModalProps> = ({
             </div>
           </div>
 
-          {/* Verified Public Customer Link (Fixes 403 Forbidden Error) */}
-          <div className="p-3.5 bg-gradient-to-r from-emerald-50 via-teal-50/60 to-white rounded-2xl border border-emerald-300 shadow-2xs">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
-            <div className="space-y-1">
-              <div className="flex items-center gap-2">
-                <div className="w-6 h-6 rounded-lg bg-emerald-700 text-white flex items-center justify-center">
-                  <Globe className="w-3.5 h-3.5" />
-                </div>
-                <h4 className="font-bold text-stone-900 text-xs sm:text-sm flex items-center gap-1.5">
-                  <span>Customer Store Link (Public — No 403 Error)</span>
-                  <span className="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full border border-emerald-300">
-                    Active & Safe
-                  </span>
-                </h4>
+          {/* Public Store Link Ribbon */}
+          <div className="p-3.5 bg-gradient-to-r from-emerald-50 via-teal-50/50 to-white rounded-2xl border border-emerald-200/90 shadow-2xs flex flex-col md:flex-row md:items-center justify-between gap-3">
+            <div className="flex items-center gap-2.5 min-w-0">
+              <div className="w-8 h-8 rounded-xl bg-emerald-700 text-white flex items-center justify-center shrink-0">
+                <Globe className="w-4 h-4" />
               </div>
-              <p className="text-stone-600 text-[11px] leading-relaxed">
-                Customers ko yahi link share karein. Browser ke address bar wala link (jisme <code className="bg-rose-50 text-rose-800 px-1 py-0.5 rounded font-mono font-bold">ais-dev</code> hota hai) private hota hai jisse customer ko <strong>403 Forbidden</strong> error aata hai. Niche diya gaya link bina kisi login ke khulta hai:
-              </p>
+              <div className="min-w-0">
+                <span className="font-bold text-stone-900 text-xs block">Public Storefront Domain</span>
+                <span className="text-[11px] text-stone-500 font-mono truncate block">{publicStoreUrl}</span>
+              </div>
             </div>
 
-            <div className="flex flex-wrap items-center gap-2 shrink-0">
+            <div className="flex items-center gap-2 shrink-0">
+              <button
+                type="button"
+                onClick={() => {
+                  navigator.clipboard.writeText(publicStoreUrl);
+                  setCopiedLink(true);
+                  setTimeout(() => setCopiedLink(false), 2500);
+                }}
+                className="py-1.5 px-3 rounded-xl bg-white hover:bg-stone-50 border border-stone-300 font-bold text-xs text-stone-800 flex items-center gap-1.5 transition shadow-2xs cursor-pointer"
+              >
+                {copiedLink ? (
+                  <>
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                    <span className="text-emerald-700">Copied</span>
+                  </>
+                ) : (
+                  <>
+                    <Copy className="w-3.5 h-3.5 text-stone-500" />
+                    <span>Copy Link</span>
+                  </>
+                )}
+              </button>
+
               <a
                 href={whatsappShareUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="py-2 px-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs flex items-center gap-1.5 transition shadow-xs cursor-pointer"
+                className="py-1.5 px-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs flex items-center gap-1.5 transition shadow-2xs cursor-pointer"
               >
                 <Share2 className="w-3.5 h-3.5" />
-                <span>Share on WhatsApp</span>
+                <span>WhatsApp</span>
               </a>
 
               <a
                 href={publicStoreUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="py-2 px-3 bg-stone-900 hover:bg-stone-800 text-white font-bold rounded-xl text-xs flex items-center gap-1.5 transition shadow-xs"
+                className="py-1.5 px-3 bg-stone-900 hover:bg-stone-800 text-white font-bold rounded-xl text-xs flex items-center gap-1.5 transition shadow-2xs"
               >
                 <ExternalLink className="w-3.5 h-3.5 text-amber-300" />
-                <span>Test Link</span>
+                <span>Visit Store</span>
               </a>
             </div>
           </div>
-
-          <div className="mt-2.5 flex items-center gap-2">
-            <input
-              type="text"
-              readOnly
-              value={publicStoreUrl}
-              className="flex-1 bg-white border border-stone-300 rounded-xl px-3 py-1.5 text-xs text-stone-800 font-mono select-all outline-hidden focus:border-emerald-500 shadow-2xs"
-            />
-            <button
-              type="button"
-              onClick={() => {
-                navigator.clipboard.writeText(publicStoreUrl);
-                setCopiedLink(true);
-                setTimeout(() => setCopiedLink(false), 2500);
-              }}
-              className="py-1.5 px-3.5 rounded-xl bg-white hover:bg-stone-50 border border-stone-300 font-bold text-xs text-stone-800 flex items-center gap-1.5 transition cursor-pointer shrink-0"
-            >
-              {copiedLink ? (
-                <>
-                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                  <span className="text-emerald-700">Copied!</span>
-                </>
-              ) : (
-                <>
-                  <Copy className="w-3.5 h-3.5 text-stone-500" />
-                  <span>Copy Link</span>
-                </>
-              )}
-            </button>
-          </div>
-        </div>
 
         {/* Tab 1: Catalogue Manager */}
         {activeTab === 'inventory' && (
@@ -654,7 +637,7 @@ export const OwnerDashboardModal: React.FC<OwnerDashboardModalProps> = ({
                     </span>
                   </div>
                   <p className="text-[11px] text-stone-500 mt-0.5">
-                    Aapka catalogue sidha Cloud Database me sync hota hai. Sabhi customers ko mobile aur computer par live dikhta hai.
+                    Your collection synchronizes directly with the Cloud Database and is live across all devices.
                   </p>
                 </div>
               </div>
@@ -744,9 +727,9 @@ export const OwnerDashboardModal: React.FC<OwnerDashboardModalProps> = ({
                       <tr>
                         <td colSpan={5} className="p-10 text-center text-stone-500">
                           <Package className="w-10 h-10 text-stone-300 mx-auto mb-2" />
-                          <p className="font-bold text-stone-800 text-sm">Abhi Catalogue Khali Hai (No Sarees)</p>
+                          <p className="font-bold text-stone-800 text-sm">Catalog is Currently Empty</p>
                           <p className="text-xs text-stone-400 mt-1 mb-4">
-                            Saree ki photo upload karke nayi saree live customer store me add karein.
+                            Upload saree photos to publish new collection items to your storefront.
                           </p>
                           <button
                             type="button"

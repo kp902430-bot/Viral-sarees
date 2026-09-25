@@ -17,6 +17,8 @@ export const FeaturedReelsSection: React.FC<FeaturedReelsSectionProps> = ({
   onOpenAllReels,
   onAddToCart,
 }) => {
+  if (!reels || reels.length === 0) return null;
+
   // Take top 4 trending reels
   const featured = reels.slice(0, 4);
 

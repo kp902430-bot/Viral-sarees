@@ -35,7 +35,7 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
             {/* Top Royal Badge */}
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gradient-to-r from-amber-400/20 via-amber-300/10 to-amber-400/20 border border-amber-300/40 text-amber-200 text-[11px] sm:text-xs font-semibold tracking-wider uppercase shadow-xs">
               <Crown className="w-3.5 h-3.5 text-amber-300 fill-amber-300" />
-              <span>Direct From Surat & Varanasi Weavers</span>
+              <span>Direct From Surat & Banarsi Master Weavers</span>
             </div>
 
             {/* Brand Title & Taglines (Well-proportioned & High Craftsmanship) */}
@@ -73,7 +73,7 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
 
             {/* Store Description (Directly precedes the catalogue) */}
             <p className="text-stone-100 text-xs sm:text-sm max-w-2xl leading-relaxed">
-              India ki sabse viral aur trending sarees direct Surat aur Varanasi master weavers se. Har design me 100% premium fabric aur authentic craftsmanship — bina kisi middleman ke direct aapke ghar tak.
+              India's most trending and viral sarees, sourced directly from Surat and Banarsi master weavers. Each drape offers authentic craftsmanship and premium fabrics — delivered straight to your doorstep without middlemen.
             </p>
 
             {/* Quick Helper Links */}

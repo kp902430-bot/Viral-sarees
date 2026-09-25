@@ -105,7 +105,7 @@ export const EditSareeModal: React.FC<EditSareeModalProps> = ({
       }
     } catch (err: any) {
       console.error(err);
-      setPhotoError('Photo process karne me samasya aayi. Kripya doosri photo try karein.');
+      setPhotoError('Failed to process image. Please try another photo.');
     } finally {
       setIsProcessing(false);
     }
@@ -120,7 +120,7 @@ export const EditSareeModal: React.FC<EditSareeModalProps> = ({
     if (!title.trim()) return;
 
     if (images.length === 0) {
-      setPhotoError('Kripya saree ki kam se kam ek photo upload karein.');
+      setPhotoError('Please upload at least one saree photo.');
       return;
     }
 
@@ -181,7 +181,7 @@ export const EditSareeModal: React.FC<EditSareeModalProps> = ({
                 </span>
               </h3>
               <p className="text-xs text-rose-200">
-                Saree ki category, price ya photos update karein. Customers ko turant updated dikhega.
+                Update saree category, pricing, details, and photos. Changes reflect immediately across the store.
               </p>
             </div>
           </div>
@@ -198,7 +198,7 @@ export const EditSareeModal: React.FC<EditSareeModalProps> = ({
           {successMsg && (
             <div className="p-3.5 bg-emerald-50 border border-emerald-300 text-emerald-900 rounded-xl flex items-center gap-2.5 font-bold text-xs">
               <Check className="w-4 h-4 text-emerald-600 shrink-0" />
-              <span>Saree & Category safaltapoorvak update ho gayi hai! Sabhi customers ko ab updated dikhegi.</span>
+              <span>Saree & category details successfully updated and live!</span>
             </div>
           )}
 

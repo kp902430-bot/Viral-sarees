@@ -33,11 +33,11 @@ export const OrderLoginPromptModal: React.FC<OrderLoginPromptModalProps> = ({
             <div>
               <div className="flex items-center gap-2">
                 <h3 className="text-base sm:text-lg font-bold font-serif-brand tracking-tight">
-                  Order Se Pehle Email Login
+                  Checkout Verification
                 </h3>
               </div>
               <p className="text-xs text-amber-200/90 font-medium mt-0.5">
-                Cash on Delivery (COD) ke liye Email Login anivarya hai
+                Sign in with Email to enable Cash on Delivery (COD)
               </p>
             </div>
           </div>
@@ -55,15 +55,15 @@ export const OrderLoginPromptModal: React.FC<OrderLoginPromptModalProps> = ({
         <div className="p-5 sm:p-6 overflow-y-auto space-y-4 text-xs">
           
           {/* Important Rule Banner */}
-          <div className="p-3.5 bg-amber-50 border-2 border-amber-300 rounded-2xl space-y-1.5 text-stone-800">
+          <div className="p-3.5 bg-amber-50 border-2 border-amber-300 rounded-2xl space-y-1 text-stone-800">
             <div className="flex items-center gap-2">
               <AlertTriangle className="w-4 h-4 text-amber-800 shrink-0" />
               <span className="font-bold text-amber-950 text-xs sm:text-sm">
-                Store Ordering Policy Notice
+                Ordering & Payment Policy
               </span>
             </div>
             <p className="text-[11px] sm:text-xs text-stone-700 leading-relaxed">
-              Viral Sarees par <strong>Cash on Delivery (COD)</strong> keval verified Email se login kiye hue customers ke liye upalabdha hai. Agar aap <strong>bina login ke order</strong> karte hain toh COD nahi hoga, aapko <strong>pehle online payment (UPI / Card)</strong> karna hoga tabhi order place hoga.
+              <strong>Cash on Delivery (COD)</strong> is exclusively available for verified customer accounts. Guest orders require <strong>advance online payment (UPI, Cards, NetBanking)</strong> to confirm shipment.
             </p>
           </div>
 
@@ -76,13 +76,13 @@ export const OrderLoginPromptModal: React.FC<OrderLoginPromptModalProps> = ({
                 </span>
                 <div>
                   <h4 className="font-bold text-sm text-stone-900 flex items-center gap-1.5">
-                    <span>Email OTP Se Login Karein</span>
+                    <span>Sign In with Email OTP</span>
                     <span className="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full border border-emerald-300">
                       Recommended
                     </span>
                   </h4>
                   <p className="text-[11px] text-emerald-900 font-medium">
-                    Cash on Delivery (COD) turant unlock ho jayega
+                    Unlocks Cash on Delivery (COD) instantly
                   </p>
                 </div>
               </div>
@@ -91,15 +91,15 @@ export const OrderLoginPromptModal: React.FC<OrderLoginPromptModalProps> = ({
             <ul className="space-y-1.5 text-[11px] text-stone-700 pl-8 list-none">
               <li className="flex items-center gap-2">
                 <Check className="w-3.5 h-3.5 text-emerald-700 shrink-0" />
-                <span><strong>Cash on Delivery (COD) Available:</strong> Ghar aane par cash ya courier QR scan karke pay karein.</span>
+                <span><strong>Cash on Delivery Available:</strong> Pay upon delivery via cash or courier QR scan.</span>
               </li>
               <li className="flex items-center gap-2">
                 <Check className="w-3.5 h-3.5 text-emerald-700 shrink-0" />
-                <span><strong>Live SMS &amp; Courier Tracking:</strong> BlueDart courier AWB tracking real-time status.</span>
+                <span><strong>Live Courier Tracking:</strong> Real-time BlueDart / Delhivery tracking updates.</span>
               </li>
               <li className="flex items-center gap-2">
                 <Check className="w-3.5 h-3.5 text-emerald-700 shrink-0" />
-                <span><strong>Instant GST Invoice:</strong> Har order ka official digital tax receipt aapke account me.</span>
+                <span><strong>Digital GST Invoice:</strong> Official tax receipt sent directly to your account.</span>
               </li>
             </ul>
 
@@ -109,7 +109,7 @@ export const OrderLoginPromptModal: React.FC<OrderLoginPromptModalProps> = ({
               className="w-full py-3 px-4 bg-gradient-to-r from-emerald-600 via-teal-700 to-emerald-700 hover:opacity-95 text-white font-bold rounded-xl shadow-md transition text-xs sm:text-sm flex items-center justify-center gap-2 cursor-pointer active:scale-98"
             >
               <Mail className="w-4 h-4 text-emerald-200" />
-              <span>Email Se Login Karein &amp; COD Unlock Karein</span>
+              <span>Sign In with Email & Unlock COD</span>
               <ArrowRight className="w-4 h-4" />
             </button>
           </div>
@@ -123,10 +123,10 @@ export const OrderLoginPromptModal: React.FC<OrderLoginPromptModalProps> = ({
                 </span>
                 <div>
                   <h4 className="font-bold text-sm text-stone-900">
-                    Bina Login Continue Karein
+                    Continue as Guest
                   </h4>
                   <p className="text-[11px] text-rose-700 font-semibold">
-                    Keval Advance Online Payment (No COD)
+                    Advance Online Payment Only (No COD)
                   </p>
                 </div>
               </div>
@@ -136,7 +136,7 @@ export const OrderLoginPromptModal: React.FC<OrderLoginPromptModalProps> = ({
             </div>
 
             <p className="text-[11px] text-stone-600 pl-8 leading-snug">
-              Aap bina login kiye bhi order kar sakte hain, par <strong>Cash on Delivery nahi milega</strong>. Order confirm karne ke liye aapko abhi <strong>PhonePe, Google Pay, Paytm, UPI, Card ya NetBanking</strong> dwara turant pay karna padega.
+              You can place an order as a guest with instant online payment via <strong>UPI, PhonePe, Google Pay, Cards, or NetBanking</strong>. Cash on Delivery is disabled for guest orders.
             </p>
 
             <button
@@ -145,7 +145,7 @@ export const OrderLoginPromptModal: React.FC<OrderLoginPromptModalProps> = ({
               className="w-full py-2.5 px-4 bg-white hover:bg-stone-100 text-stone-800 border border-stone-400 font-bold rounded-xl transition text-xs flex items-center justify-center gap-2 cursor-pointer active:scale-98 shadow-2xs"
             >
               <CreditCard className="w-4 h-4 text-stone-600" />
-              <span>Bina Login Online Pay Karke Order Karein</span>
+              <span>Continue with Advance Online Payment</span>
             </button>
           </div>
 

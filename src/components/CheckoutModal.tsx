@@ -117,7 +117,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
     }
 
     if (paymentMethod === 'COD' && !isLoggedInWithEmail) {
-      setValidationError('Cash on Delivery (COD) ke liye Email Login anivarya (compulsory) hai. Kripya pehle email verify karke login karein ya online advance payment dwara order karein.');
+      setValidationError('Cash on Delivery (COD) is available exclusively for verified customer accounts. Please sign in with your email or proceed with online advance payment.');
       return;
     }
 
@@ -287,7 +287,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                       Guest Checkout: Cash on Delivery (COD) Locked
                     </h4>
                     <p className="text-[11px] text-amber-900 font-medium">
-                      Bina login ke keval <strong>Online Advance Payment</strong> upalabdha hai
+                      Advance Online Payment is required for guest orders
                     </p>
                   </div>
                 </div>
@@ -297,7 +297,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
               </div>
 
               <p className="text-[11px] text-stone-700 leading-relaxed">
-                Store policy ke anusaar <strong>Cash on Delivery (COD)</strong> keval verified Email ID se login kiye hue customers ko milta hai. Bina login ke order book karne ke liye aapko <strong>pehle online payment (UPI / QR / Card)</strong> karna padega.
+                By store policy, <strong>Cash on Delivery (COD)</strong> is provided exclusively to customers verified with an email address. Guest orders are confirmed upon <strong>advance online payment (UPI, Cards, NetBanking)</strong>.
               </p>
 
               {onOpenCustomerAuth && (
@@ -308,11 +308,11 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                     className="w-full sm:w-auto py-2 px-4 bg-gradient-to-r from-amber-600 via-amber-700 to-[#800020] hover:opacity-95 text-white font-bold rounded-xl text-xs flex items-center justify-center gap-2 transition cursor-pointer shadow-xs active:scale-98"
                   >
                     <Mail className="w-3.5 h-3.5 text-amber-200" />
-                    <span>Email Login Karein (COD Unlock Karein)</span>
+                    <span>Sign In with Email (Unlock COD)</span>
                     <ArrowRight className="w-3.5 h-3.5" />
                   </button>
                   <span className="text-[10px] text-stone-500 font-medium">
-                    ya neeche UPI/Card se advance payment karke continue karein
+                    or continue below with UPI/Card payment
                   </span>
                 </div>
               )}
@@ -490,7 +490,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                 type="button"
                 onClick={() => {
                   if (!isLoggedInWithEmail) {
-                    setValidationError('Cash on Delivery (COD) ke liye Email Login compulsory hai. Kripya pehle email se login karein ya advance online payment (UPI/Cards) karein.');
+                    setValidationError('Cash on Delivery (COD) is available exclusively for verified accounts. Please sign in with your email or select an online payment option.');
                     if (onOpenCustomerAuth) {
                       onOpenCustomerAuth();
                     }
@@ -526,20 +526,20 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
               </button>
             </div>
 
-            {/* Guest Payment Compulsory Notice */}
+            {/* Guest Payment Policy Notice */}
             {!isLoggedInWithEmail && (
               <div className="mb-4 p-3 bg-amber-50/90 border border-amber-300 rounded-xl space-y-1.5 text-stone-800 animate-fadeIn">
                 <div className="flex items-center justify-between gap-1">
                   <span className="font-bold text-xs text-amber-950 flex items-center gap-1.5">
                     <Lock className="w-3.5 h-3.5 text-amber-800 shrink-0" />
-                    <span>COD Policy: Advance Online Payment Compulsory Without Login</span>
+                    <span>Advance Online Payment Required for Guest Orders</span>
                   </span>
                   <span className="text-[9px] bg-rose-100 text-rose-900 font-extrabold px-2 py-0.5 rounded border border-rose-300">
                     No COD
                   </span>
                 </div>
                 <p className="text-[11px] text-stone-700 leading-snug">
-                  Bina login ke order confirm karne ke liye <strong>advance online payment (UPI, PhonePe, GPay, Paytm, Card) compulsory hai</strong>. Cash on Delivery keval verified Email se login karne par hi milta hai.
+                  Guest checkout requires <strong>advance online payment (UPI, PhonePe, GPay, Paytm, Cards)</strong>. Cash on Delivery is enabled upon email sign in.
                 </p>
                 {onOpenCustomerAuth && (
                   <button
@@ -548,7 +548,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                     className="text-[11px] text-amber-900 hover:text-amber-950 font-bold underline inline-flex items-center gap-1 cursor-pointer pt-0.5"
                   >
                     <Mail className="w-3.5 h-3.5" />
-                    <span>Email OTP Login Karke Cash on Delivery (COD) Unlock Karein &rarr;</span>
+                    <span>Sign In with Email OTP to Unlock Cash on Delivery &rarr;</span>
                   </button>
                 )}
               </div>
@@ -853,7 +853,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
             <p className="text-[10px] text-center text-stone-400">
               {!isLoggedInWithEmail ? (
                 <span className="text-amber-300 font-medium">
-                  ⚠️ Guest Order: Advance online payment compulsory before order dispatch. COD ke liye Email Login karein.
+                  ⚠️ Guest Order: Advance online payment required before dispatch. Sign in for Cash on Delivery.
                 </span>
               ) : paymentMethod === 'COD' ? (
                 <span className="text-emerald-400 font-medium">

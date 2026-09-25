@@ -95,11 +95,11 @@ export const AddSareeModal: React.FC<AddSareeModalProps> = ({
       if (newImageUrls.length > 0) {
         setImages((prev) => [...prev, ...newImageUrls]);
       } else {
-        setPhotoError('Valid image file select karein (JPEG, PNG, WebP).');
+        setPhotoError('Please select a valid image file (JPEG, PNG, WebP).');
       }
     } catch (err) {
       console.error('Error processing image:', err);
-      setPhotoError('Photo process karne me truti hui. Kripya punah prayas karein.');
+      setPhotoError('Failed to process image. Please try again.');
     } finally {
       setIsProcessing(false);
     }
@@ -145,7 +145,7 @@ export const AddSareeModal: React.FC<AddSareeModalProps> = ({
     if (!title.trim()) return;
 
     if (images.length === 0) {
-      setPhotoError('Kripya saree ki kam se kam ek photo upload karein.');
+      setPhotoError('Please upload at least one saree photo.');
       return;
     }
 
@@ -257,7 +257,7 @@ export const AddSareeModal: React.FC<AddSareeModalProps> = ({
                   <span>Saree Photo Upload *</span>
                 </label>
                 <p className="text-[11px] text-stone-500">
-                  Apne device, gallery ya camera se sidha saree ki photo add karein.
+                  Upload photos directly from your device, gallery or camera.
                 </p>
               </div>
               {images.length > 0 && (
@@ -425,7 +425,7 @@ export const AddSareeModal: React.FC<AddSareeModalProps> = ({
                   onClick={() => setShowUrlFallback(true)}
                   className="text-[11px] text-stone-400 hover:text-stone-700 underline cursor-pointer"
                 >
-                  Agar image URL se add karna ho toh yahan click karein
+                  Or click here to add via Image Web URL
                 </button>
               ) : (
                 <div className="p-3 bg-white rounded-xl border border-stone-200 space-y-2">

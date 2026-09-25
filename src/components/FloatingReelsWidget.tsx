@@ -10,6 +10,8 @@ export const FloatingReelsWidget: React.FC<FloatingReelsWidgetProps> = ({
   onOpenReels,
   reelsCount
 }) => {
+  if (reelsCount === 0) return null;
+
   return (
     <aside aria-label="Floating Saree Reels" className="fixed bottom-20 md:bottom-6 right-4 md:right-6 z-30">
       <button

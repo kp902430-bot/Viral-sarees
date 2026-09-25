@@ -87,9 +87,17 @@ export default function App() {
   const [reels, setReels] = useState<SareeReel[]>(() => {
     try {
       const saved = localStorage.getItem('vls_saree_reels');
-      return saved ? JSON.parse(saved) : INITIAL_REELS;
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) {
+          // Remove old demo mock reels
+          const realReels = parsed.filter((r: SareeReel) => !/^reel-0[1-9]/.test(r.id || ''));
+          return realReels;
+        }
+      }
+      return [];
     } catch {
-      return INITIAL_REELS;
+      return [];
     }
   });
 
@@ -1351,13 +1359,13 @@ export default function App() {
                 <div className="py-16 px-4 text-center bg-white rounded-3xl border border-stone-200 space-y-3">
                   <Package className="w-12 h-12 text-stone-300 mx-auto" />
                   <h3 className="text-base font-bold text-stone-800">
-                    {sarees.length === 0 ? 'Catalogue me abhi koi saree nahi hai' : 'No Sarees Found Matching Your Filters'}
+                    {sarees.length === 0 ? 'No sarees currently in the catalog' : 'No Sarees Found Matching Your Filters'}
                   </h3>
                   <p className="text-xs text-stone-500 max-w-sm mx-auto">
                     {sarees.length === 0
                       ? (isOwnerAuthorized
-                          ? 'Aap Store Owner hain. Nayi saree add karne ke liye sidha photo upload karein!'
-                          : 'Naye designs aur handloom collection jald live hone wale hain.')
+                          ? 'You are signed in as Store Owner. Click below to upload saree photos and publish items!'
+                          : 'New handcrafted collections and trending weaves will be live shortly.')
                       : 'Try clearing your search term or selecting "All Sarees" to view our complete collection.'}
                   </p>
                   {sarees.length === 0 ? (

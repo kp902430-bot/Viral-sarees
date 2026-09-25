@@ -53,13 +53,15 @@ export const ReelsFeedView: React.FC<ReelsFeedViewProps> = ({
           </p>
 
           <div className="flex flex-wrap items-center gap-4 pt-2">
-            <button
-              onClick={() => onSelectReel(reels[0])}
-              className="px-6 py-3 rounded-xl bg-linear-to-r from-amber-500 via-amber-400 to-amber-500 hover:from-amber-400 hover:to-amber-300 text-stone-950 font-extrabold text-sm shadow-xl shadow-amber-950/40 transition flex items-center gap-2 cursor-pointer transform hover:scale-105"
-            >
-              <Play className="w-4 h-4 fill-stone-950" />
-              <span>Start Watching Reels</span>
-            </button>
+            {reels.length > 0 && (
+              <button
+                onClick={() => onSelectReel(reels[0])}
+                className="px-6 py-3 rounded-xl bg-linear-to-r from-amber-500 via-amber-400 to-amber-500 hover:from-amber-400 hover:to-amber-300 text-stone-950 font-extrabold text-sm shadow-xl shadow-amber-950/40 transition flex items-center gap-2 cursor-pointer transform hover:scale-105"
+              >
+                <Play className="w-4 h-4 fill-stone-950" />
+                <span>Start Watching Reels</span>
+              </button>
+            )}
 
             <button
               onClick={onBackToCatalogue}
@@ -72,27 +74,44 @@ export const ReelsFeedView: React.FC<ReelsFeedViewProps> = ({
       </div>
 
       {/* Filter Chips */}
-      <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none border-b border-stone-200">
-        <span className="text-xs font-bold text-stone-500 uppercase tracking-wider pl-1">
-          Explore by Mood:
-        </span>
-        {tags.map((tag) => (
-          <button
-            key={tag}
-            onClick={() => setFilterTag(tag)}
-            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition whitespace-nowrap cursor-pointer ${
-              filterTag === tag
-                ? 'bg-[#800020] text-amber-100 shadow-md shadow-rose-950/20'
-                : 'bg-white text-stone-700 border border-stone-300 hover:border-stone-500'
-            }`}
-          >
-            {tag === 'all' ? '✨ All Saree Reels' : `#${tag}`}
-          </button>
-        ))}
-      </div>
+      {reels.length > 0 && (
+        <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none border-b border-stone-200">
+          <span className="text-xs font-bold text-stone-500 uppercase tracking-wider pl-1">
+            Explore by Mood:
+          </span>
+          {tags.map((tag) => (
+            <button
+              key={tag}
+              onClick={() => setFilterTag(tag)}
+              className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition whitespace-nowrap cursor-pointer ${
+                filterTag === tag
+                  ? 'bg-[#800020] text-amber-100 shadow-md shadow-rose-950/20'
+                  : 'bg-white text-stone-700 border border-stone-300 hover:border-stone-500'
+              }`}
+            >
+              {tag === 'all' ? '✨ All Saree Reels' : `#${tag}`}
+            </button>
+          ))}
+        </div>
+      )}
 
-      {/* Reels Grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+      {/* Reels Grid or Empty State */}
+      {filteredReels.length === 0 ? (
+        <div className="py-20 px-6 text-center bg-stone-900/60 rounded-3xl border border-stone-800 space-y-3 text-stone-300">
+          <Film className="w-12 h-12 text-stone-500 mx-auto" />
+          <h3 className="text-base font-bold text-white">No Video Reels Published Yet</h3>
+          <p className="text-xs text-stone-400 max-w-md mx-auto">
+            Authentic saree drape videos, 360° fabric luster, and styling reels will appear here once published.
+          </p>
+          <button
+            onClick={onBackToCatalogue}
+            className="px-5 py-2.5 bg-[#800020] hover:bg-[#9B111E] text-amber-100 font-bold rounded-xl text-xs inline-flex items-center gap-2 cursor-pointer shadow-xs transition"
+          >
+            ← Back to Saree Catalogue
+          </button>
+        </div>
+      ) : (
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
         {filteredReels.map((reel) => {
           const linkedSaree = sarees.find(s => s.id === reel.sareeId);
           return (
@@ -173,7 +192,8 @@ export const ReelsFeedView: React.FC<ReelsFeedViewProps> = ({
             </div>
           );
         })}
-      </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -259,18 +259,18 @@ export const CustomerAuthModal: React.FC<CustomerAuthModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-xs overflow-y-auto animate-fadeIn">
-      <div className="relative w-full max-w-md bg-white rounded-3xl shadow-2xl overflow-hidden my-6 border-2 border-amber-500/40 max-h-[92vh] flex flex-col">
+    <div className="fixed inset-0 z-[60] flex items-center justify-center p-0 sm:p-4 bg-black/80 backdrop-blur-xs overflow-hidden animate-fadeIn">
+      <div className="relative w-full max-w-md bg-white rounded-none sm:rounded-3xl shadow-2xl overflow-hidden h-[100dvh] sm:h-auto sm:max-h-[92vh] border-0 sm:border-2 sm:border-amber-500/40 flex flex-col">
         
         {/* Header */}
-        <div className="bg-linear-to-r from-[#590417] via-[#800020] to-[#3a020e] text-white p-5 sm:p-6 flex items-center justify-between">
+        <div className="shrink-0 bg-linear-to-r from-[#590417] via-[#800020] to-[#3a020e] text-white p-4 sm:p-5 flex items-center justify-between shadow-xs">
           <div className="flex items-center gap-3">
-            <div className="w-11 h-11 rounded-2xl bg-amber-400/20 border border-amber-300/40 flex items-center justify-center text-amber-300">
+            <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-amber-400/20 border border-amber-300/40 flex items-center justify-center text-amber-300 shrink-0">
               <User className="w-5 h-5" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="text-lg font-bold font-serif-brand tracking-tight">
+                <h3 className="text-base sm:text-lg font-bold font-serif-brand tracking-tight">
                   {currentCustomer ? 'Customer Account' : 'Customer Sign In'}
                 </h3>
                 <span className="bg-amber-400/25 text-amber-200 border border-amber-300/40 text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">
@@ -292,8 +292,8 @@ export const CustomerAuthModal: React.FC<CustomerAuthModalProps> = ({
           </button>
         </div>
 
-        {/* Modal Body */}
-        <div className="p-5 sm:p-6 overflow-y-auto flex-1 space-y-5 text-stone-800">
+        {/* Modal Body - Smooth Mobile Touch Scrolling */}
+        <div className="flex-1 overflow-y-auto overscroll-y-contain touch-pan-y p-5 sm:p-6 space-y-5 text-stone-800 [webkit-overflow-scrolling:touch]">
           {currentCustomer ? (
             /* Logged In Customer Profile & My Orders */
             <div className="space-y-5">
@@ -559,32 +559,6 @@ export const CustomerAuthModal: React.FC<CustomerAuthModalProps> = ({
                       <p className="text-stone-700 text-[11px] mt-1 leading-relaxed">
                         A 6-digit verification code has been dispatched to <strong className="text-stone-900 font-mono">{email}</strong>.
                       </p>
-                    </div>
-                  </div>
-
-                  {/* Email Specific Spam & Direct Search Guidance */}
-                  <div className="p-3 bg-amber-50/80 border border-amber-200/90 rounded-2xl text-xs text-stone-700 space-y-2">
-                    <div className="flex items-start gap-2">
-                      <AlertTriangle className="w-4 h-4 text-amber-700 shrink-0 mt-0.5" />
-                      <div>
-                        <p className="font-semibold text-amber-950 text-[11px]">
-                          Agar Inbox me OTP na dikhe:
-                        </p>
-                        <p className="text-[11px] text-stone-600 mt-0.5">
-                          Gmail ya mail app me <strong>Spam / Junk</strong> ya <strong>Updates / Promotions</strong> folder zaroor check karein.
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2 pt-1">
-                      <a
-                        href="https://mail.google.com/mail/u/0/#search/Viral+Sarees"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="px-2.5 py-1.5 bg-white hover:bg-amber-100 text-stone-800 border border-amber-300 rounded-lg text-[11px] font-medium flex items-center gap-1.5 shadow-2xs transition"
-                      >
-                        <ExternalLink className="w-3 h-3 text-amber-800" />
-                        <span>Open Gmail & Search "Viral Sarees"</span>
-                      </a>
                     </div>
                   </div>
 

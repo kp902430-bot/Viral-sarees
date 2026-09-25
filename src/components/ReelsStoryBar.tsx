@@ -13,6 +13,8 @@ export const ReelsStoryBar: React.FC<ReelsStoryBarProps> = ({
   onSelectReel,
   onOpenAllReels,
 }) => {
+  if (!reels || reels.length === 0) return null;
+
   return (
     <div className="w-full bg-linear-to-r from-[#2A0800] via-[#1E0505] to-[#2D0A0E] rounded-3xl p-4 sm:p-5 border border-amber-500/30 shadow-xl shadow-stone-950/20 text-white overflow-hidden relative">
       {/* Background glow and subtle zari pattern */}
