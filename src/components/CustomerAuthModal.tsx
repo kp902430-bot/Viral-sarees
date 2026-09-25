@@ -17,6 +17,7 @@ interface CustomerAuthModalProps {
   orders: Order[];
   onTrackOrder: (orderId: string) => void;
   customers?: CustomerProfile[];
+  onOpenOwnerPortal?: () => void;
 }
 
 export const CustomerAuthModal: React.FC<CustomerAuthModalProps> = ({
@@ -27,7 +28,8 @@ export const CustomerAuthModal: React.FC<CustomerAuthModalProps> = ({
   onLogout,
   orders,
   onTrackOrder,
-  customers = []
+  customers = [],
+  onOpenOwnerPortal
 }) => {
   // Login form state
   const [email, setEmail] = useState('');
@@ -340,6 +342,22 @@ export const CustomerAuthModal: React.FC<CustomerAuthModalProps> = ({
                       <span className="font-semibold text-stone-900">Saved Delivery Address: </span>
                       {currentCustomer.address.street}, {currentCustomer.address.city}, {currentCustomer.address.state} - {currentCustomer.address.pincode}
                     </div>
+                  </div>
+                )}
+
+                {/* Store Owner Special Access - STRICTLY kp902430@gmail.com only */}
+                {currentCustomer?.email?.trim().toLowerCase() === 'kp902430@gmail.com' && onOpenOwnerPortal && (
+                  <div className="mt-3 pt-3 border-t border-amber-200">
+                    <button
+                      onClick={() => {
+                        onClose();
+                        onOpenOwnerPortal();
+                      }}
+                      className="w-full py-2.5 px-3 rounded-xl bg-amber-400 hover:bg-amber-300 text-amber-950 font-bold text-xs flex items-center justify-center gap-1.5 shadow-xs transition cursor-pointer"
+                    >
+                      <Crown className="w-4 h-4 text-amber-950" />
+                      <span>👑 Open Store Owner Dashboard & Inventory</span>
+                    </button>
                   </div>
                 )}
               </div>

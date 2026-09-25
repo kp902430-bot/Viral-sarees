@@ -1572,6 +1572,7 @@ export default function App() {
         onLogout={handleCustomerLogout}
         orders={orders}
         customers={customers}
+        onOpenOwnerPortal={handleOpenOwnerPortal}
         onTrackOrder={(orderId) => {
           setTrackingTargetOrderId(orderId);
           setActiveView('tracking');
