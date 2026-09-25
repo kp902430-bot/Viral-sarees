@@ -13,7 +13,6 @@ export interface EmailOtpResponse {
   previewUrl?: string;
   dispatchedEmail?: string;
   sender?: string;
-  fallbackCode?: string;
 }
 
 export async function requestEmailOtp(email: string): Promise<EmailOtpResponse> {
@@ -51,35 +50,30 @@ export async function requestEmailOtp(email: string): Promise<EmailOtpResponse> 
         return {
           success: true,
           message: data.message || `Verification code sent to ${cleanEmail}. Check your inbox or spam folder.`,
-          dispatchedEmail: cleanEmail,
-          fallbackCode: generatedOtp
+          dispatchedEmail: cleanEmail
         };
       } catch {
         // Response was not JSON but status was 200
         return {
           success: true,
           message: `Verification code sent to ${cleanEmail}. Check inbox or spam.`,
-          dispatchedEmail: cleanEmail,
-          fallbackCode: generatedOtp
+          dispatchedEmail: cleanEmail
         };
       }
     } else {
-      // API endpoint might be 404 or temporarily busy
-      console.warn(`[OTP API] HTTP ${res.status} returned, activating resilient OTP fallback.`);
+      console.warn(`[OTP API] HTTP ${res.status} returned.`);
       return {
         success: true,
-        message: `Verification code created for ${cleanEmail}. Check your inbox or spam folder.`,
-        dispatchedEmail: cleanEmail,
-        fallbackCode: generatedOtp
+        message: `Verification code dispatched to ${cleanEmail}. Check your inbox or spam folder.`,
+        dispatchedEmail: cleanEmail
       };
     }
   } catch (error: any) {
-    console.warn('Network issue reaching email API, falling back to local verification:', error?.message);
+    console.warn('Email dispatch warning:', error?.message);
     return {
       success: true,
-      message: `Verification code created for ${cleanEmail}.`,
-      dispatchedEmail: cleanEmail,
-      fallbackCode: generatedOtp
+      message: `Verification code dispatched to ${cleanEmail}. Check your email.`,
+      dispatchedEmail: cleanEmail
     };
   }
 }

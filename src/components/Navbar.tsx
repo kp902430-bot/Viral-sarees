@@ -58,6 +58,16 @@ export const Navbar: React.FC<NavbarProps> = ({
 }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
+  // STRICT SECURITY RULE: Only kp902430@gmail.com is authorized as owner
+  // Customer or any other email will NEVER see any owner button or detail anywhere!
+  const isOwnerAuthorized = Boolean(
+    currentCustomer &&
+    currentCustomer.email &&
+    currentCustomer.email.trim().toLowerCase() === 'kp902430@gmail.com' &&
+    ownerSession?.isLoggedIn &&
+    ownerSession?.email?.trim().toLowerCase() === 'kp902430@gmail.com'
+  );
+
   const handleLogoTap = () => {
     setActiveView('home');
     onGoHome();
@@ -297,8 +307,8 @@ export const Navbar: React.FC<NavbarProps> = ({
               <span>Returns</span>
             </button>
 
-            {/* Owner Section - Only visible if the store owner is already logged in */}
-            {ownerSession?.isLoggedIn && (
+            {/* Owner Section - STRICTLY only visible if kp902430@gmail.com is logged in */}
+            {isOwnerAuthorized && (
               <div className="flex items-center gap-1.5 ml-1">
                 <button
                   id="nav-owner-dashboard-btn"
@@ -513,8 +523,8 @@ export const Navbar: React.FC<NavbarProps> = ({
             <span>Privacy & Security Policy</span>
           </button>
 
-          {/* Owner options in mobile - Only visible if logged in */}
-          {ownerSession?.isLoggedIn && (
+          {/* Owner options in mobile (3 horizontal lines) - STRICTLY only when kp902430@gmail.com is logged in */}
+          {isOwnerAuthorized && (
             <>
               <button
                 onClick={() => {

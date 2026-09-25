@@ -62,7 +62,6 @@ import {
 } from './services/orderService';
 import { broadcastNewCatalogueEmail } from './services/catalogueBroadcastService';
 import { notifyOwnerOfNewOrder, notifyOwnerOfCustomerLogin } from './services/ownerNotificationService';
-import { OwnerAuthModal } from './components/OwnerAuthModal';
 import { OrderLoginPromptModal } from './components/OrderLoginPromptModal';
 
 export default function App() {
@@ -140,16 +139,6 @@ export default function App() {
     }
   });
 
-  // Owner Authentication Session (Persistent)
-  const [ownerSession, setOwnerSession] = useState<OwnerSession | null>(() => {
-    try {
-      const saved = localStorage.getItem('vls_owner_session');
-      return saved ? JSON.parse(saved) : null;
-    } catch {
-      return null;
-    }
-  });
-
   // Customer Account Session & Customer Leads Directory (Persistent)
   const [currentCustomer, setCurrentCustomer] = useState<CustomerProfile | null>(() => {
     try {
@@ -159,6 +148,37 @@ export default function App() {
       return null;
     }
   });
+
+  // Owner Authentication Session (STRICT: ONLY kp902430@gmail.com is authorized)
+  const [ownerSession, setOwnerSession] = useState<OwnerSession | null>(() => {
+    try {
+      const savedCustomer = localStorage.getItem('vls_current_customer');
+      const savedOwner = localStorage.getItem('vls_owner_session');
+      if (savedCustomer && savedOwner) {
+        const cust = JSON.parse(savedCustomer);
+        const owner = JSON.parse(savedOwner);
+        if (
+          cust?.email?.trim().toLowerCase() === 'kp902430@gmail.com' &&
+          owner?.email?.trim().toLowerCase() === 'kp902430@gmail.com'
+        ) {
+          return owner;
+        }
+      }
+      localStorage.removeItem('vls_owner_session');
+      return null;
+    } catch {
+      return null;
+    }
+  });
+
+  // Strict check: ONLY kp902430@gmail.com can EVER see or access the Owner Portal
+  const isOwnerAuthorized = Boolean(
+    currentCustomer &&
+    currentCustomer.email &&
+    currentCustomer.email.trim().toLowerCase() === 'kp902430@gmail.com' &&
+    ownerSession?.isLoggedIn &&
+    ownerSession?.email?.trim().toLowerCase() === 'kp902430@gmail.com'
+  );
 
   const [customers, setCustomers] = useState<CustomerProfile[]>(() => {
     try {
@@ -211,10 +231,11 @@ export default function App() {
   const [invoiceOrder, setInvoiceOrder] = useState<Order | null>(null);
 
   const handleOpenOwnerPortal = () => {
-    if (ownerSession?.isLoggedIn) {
+    if (isOwnerAuthorized) {
       setIsOwnerDashboardOpen(true);
     } else {
-      setIsOwnerAuthOpen(true);
+      showToast('Store Owner access is only available for kp902430@gmail.com.');
+      setIsCustomerAuthOpen(true);
     }
   };
 
@@ -449,17 +470,24 @@ export default function App() {
           });
         } catch {}
 
-        if (cleanEmail === 'kamal799065@gmail.com' || cleanEmail === 'kp902430@gmail.com') {
+        if (cleanEmail === 'kp902430@gmail.com') {
           const ownerSess: OwnerSession = {
             isLoggedIn: true,
-            email: cleanEmail,
-            name: displayName || 'Kamal (Viral Sarees Owner)',
+            email: 'kp902430@gmail.com',
+            name: displayName || 'Kamal (Owner)',
             role: 'Store Owner',
             loginTime: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
           };
           setOwnerSession(ownerSess);
-          showToast(`👑 Store Owner Verified! Welcome back, ${displayName || 'Kamal'}. Merchant dashboard unlocked.`);
+          try {
+            localStorage.setItem('vls_owner_session', JSON.stringify(ownerSess));
+          } catch {}
+          showToast(`👑 Store Owner Verified! Welcome back. Merchant dashboard unlocked.`);
         } else {
+          setOwnerSession(null);
+          try {
+            localStorage.removeItem('vls_owner_session');
+          } catch {}
           showToast(`Google account verified! Welcome back, ${displayName}.`);
         }
       }
@@ -480,26 +508,10 @@ export default function App() {
           setSelectedSaree(targetSaree);
         }
       }
-
-      // Secret Owner Gateway: ?owner=true or ?admin=true opens the merchant modal safely without exposing buttons to customers
-      if (params.get('owner') === 'true' || params.get('admin') === 'true' || params.get('portal') === 'true') {
-        handleOpenOwnerPortal();
-      }
-
-      // Secret Keyboard Shortcut: Ctrl + Shift + O (or Cmd + Shift + O)
-      const handleSecretKey = (e: KeyboardEvent) => {
-        if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'O' || e.key === 'o')) {
-          e.preventDefault();
-          handleOpenOwnerPortal();
-        }
-      };
-
-      window.addEventListener('keydown', handleSecretKey);
-      return () => window.removeEventListener('keydown', handleSecretKey);
     } catch (e) {
-      console.warn('Error reading deep link or secret gateway parameter:', e);
+      console.warn('Error reading deep link parameter:', e);
     }
-  }, [sarees, ownerSession]);
+  }, [sarees]);
 
   // Sync selectedSaree to browser URL search parameter for seamless direct sharing
   useEffect(() => {
@@ -593,12 +605,12 @@ export default function App() {
     initiateCheckoutFlow(discount, 'VIRAL10');
   };
 
-  // Owner Product Management (Restricted to Owner)
+  // Owner Product Management (Restricted to kp902430@gmail.com)
   const handleTriggerAddSaree = () => {
-    if (ownerSession?.isLoggedIn) {
+    if (isOwnerAuthorized) {
       setIsAddSareeOpen(true);
     } else {
-      showToast('Store Owner access required. Please sign in with registered owner email.');
+      showToast('Store Owner access is only for kp902430@gmail.com.');
       setIsCustomerAuthOpen(true);
     }
   };
@@ -694,10 +706,10 @@ export default function App() {
   };
 
   const handleTriggerAddReel = () => {
-    if (ownerSession?.isLoggedIn) {
+    if (isOwnerAuthorized) {
       setIsAddReelOpen(true);
     } else {
-      showToast('Store Owner access required. Please sign in with registered owner email.');
+      showToast('Store Owner access is only for kp902430@gmail.com.');
       setIsCustomerAuthOpen(true);
     }
   };
@@ -745,17 +757,25 @@ export default function App() {
     });
 
     const normalizedEmail = (profile.email || '').trim().toLowerCase();
-    if (normalizedEmail === 'kamal799065@gmail.com' || normalizedEmail === 'kp902430@gmail.com') {
+    if (normalizedEmail === 'kp902430@gmail.com') {
       const ownerSess: OwnerSession = {
         isLoggedIn: true,
-        email: normalizedEmail,
+        email: 'kp902430@gmail.com',
         name: profile.name || 'Kamal (Viral Sarees Owner)',
         role: 'Store Owner',
         loginTime: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
       };
       setOwnerSession(ownerSess);
+      try {
+        localStorage.setItem('vls_owner_session', JSON.stringify(ownerSess));
+      } catch {}
       showToast('👑 Store Owner Verified! Merchant controls & inventory dashboard unlocked.');
     } else {
+      // Any other customer or visitor: strictly ensure owner session is wiped and null
+      setOwnerSession(null);
+      try {
+        localStorage.removeItem('vls_owner_session');
+      } catch {}
       showToast(`Welcome back, ${profile.name}!`);
     }
 
@@ -1040,7 +1060,7 @@ export default function App() {
       <Navbar
         cartCount={cart.reduce((s, i) => s + i.quantity, 0)}
         wishlistCount={wishlist.length}
-        ownerSession={ownerSession}
+        ownerSession={isOwnerAuthorized ? ownerSession : null}
         currentCustomer={currentCustomer}
         onOpenCustomerAuth={() => setIsCustomerAuthOpen(true)}
         themeMode={themeMode}
@@ -1301,8 +1321,8 @@ export default function App() {
                     Showing <strong>{filteredSarees.length}</strong> Sarees
                   </span>
 
-                  {/* Saree Count & Restricted Owner Action (Only visible when authenticated) */}
-                  {ownerSession?.isLoggedIn && (
+                  {/* Saree Count & Restricted Owner Action (Strictly kp902430@gmail.com only) */}
+                  {isOwnerAuthorized && (
                     <div className="flex items-center gap-2">
                       <button
                         onClick={handleTriggerAddReel}
@@ -1335,13 +1355,13 @@ export default function App() {
                   </h3>
                   <p className="text-xs text-stone-500 max-w-sm mx-auto">
                     {sarees.length === 0
-                      ? (ownerSession?.isLoggedIn
+                      ? (isOwnerAuthorized
                           ? 'Aap Store Owner hain. Nayi saree add karne ke liye sidha photo upload karein!'
                           : 'Naye designs aur handloom collection jald live hone wale hain.')
                       : 'Try clearing your search term or selecting "All Sarees" to view our complete collection.'}
                   </p>
                   {sarees.length === 0 ? (
-                    ownerSession?.isLoggedIn ? (
+                    isOwnerAuthorized ? (
                       <button
                         onClick={() => setIsAddSareeOpen(true)}
                         className="px-5 py-2.5 bg-[#800020] hover:bg-[#9B111E] text-amber-100 text-xs font-bold rounded-xl inline-flex items-center gap-2 cursor-pointer shadow-xs"
@@ -1602,8 +1622,8 @@ export default function App() {
         onShowToast={(msg) => showToast(msg)}
       />
 
-      {/* Owner Inventory Dashboard Modal */}
-      {ownerSession && (
+      {/* Owner Inventory Dashboard Modal - STRICTLY restricted to kp902430@gmail.com */}
+      {isOwnerAuthorized && ownerSession && (
         <OwnerDashboardModal
           isOpen={isOwnerDashboardOpen}
           onClose={() => setIsOwnerDashboardOpen(false)}
@@ -1627,18 +1647,6 @@ export default function App() {
           }}
         />
       )}
-
-      {/* Store Owner Secure Authentication Modal */}
-      <OwnerAuthModal
-        isOpen={isOwnerAuthOpen}
-        onClose={() => setIsOwnerAuthOpen(false)}
-        onSuccess={(sess) => {
-          setOwnerSession(sess);
-          setIsOwnerDashboardOpen(true);
-          showToast('👑 Welcome Store Owner! Real-time Dashboard unlocked.');
-        }}
-        onShowToast={showToast}
-      />
 
       {/* Official Order Placed Confirmation & WhatsApp Modal */}
       <OrderSuccessModal

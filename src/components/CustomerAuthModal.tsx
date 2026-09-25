@@ -17,7 +17,6 @@ interface CustomerAuthModalProps {
   orders: Order[];
   onTrackOrder: (orderId: string) => void;
   customers?: CustomerProfile[];
-  onOpenOwnerPortal?: () => void;
 }
 
 export const CustomerAuthModal: React.FC<CustomerAuthModalProps> = ({
@@ -28,8 +27,7 @@ export const CustomerAuthModal: React.FC<CustomerAuthModalProps> = ({
   onLogout,
   orders,
   onTrackOrder,
-  customers = [],
-  onOpenOwnerPortal
+  customers = []
 }) => {
   // Login form state
   const [email, setEmail] = useState('');
@@ -47,7 +45,6 @@ export const CustomerAuthModal: React.FC<CustomerAuthModalProps> = ({
   const [resendTimer, setResendTimer] = useState(30);
   const [error, setError] = useState('');
   const [successInfo, setSuccessInfo] = useState('');
-  const [fallbackCode, setFallbackCode] = useState<string | null>(null);
 
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
@@ -134,9 +131,6 @@ export const CustomerAuthModal: React.FC<CustomerAuthModalProps> = ({
       const res = await requestEmailOtp(cleanEmail);
       if (res.success) {
         setOtpStep(true);
-        if (res.fallbackCode) {
-          setFallbackCode(res.fallbackCode);
-        }
         setSuccessInfo(`Verification code dispatched to ${cleanEmail}. Check inbox or spam folder.`);
         setTimeout(() => {
           inputRefs.current[0]?.focus();
@@ -523,42 +517,6 @@ export const CustomerAuthModal: React.FC<CustomerAuthModalProps> = ({
                           <span>Get Login OTP on Email</span>
                         </>
                       )}
-                    </button>
-
-                    <div className="relative flex py-1 items-center">
-                      <div className="grow border-t border-stone-200"></div>
-                      <span className="shrink mx-3 text-stone-400 text-[11px] uppercase tracking-wider font-semibold">Or</span>
-                      <div className="grow border-t border-stone-200"></div>
-                    </div>
-
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const cleanEmail = email.trim().toLowerCase() || 'customer@viralsarees.com';
-                        const newProfile: CustomerProfile = {
-                          id: `cust-${Date.now()}`,
-                          name: name.trim() || cleanEmail.split('@')[0].replace(/[._-]/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase()),
-                          phone: phone.replace(/\D/g, '') || '9876543210',
-                          email: cleanEmail,
-                          address: {
-                            street: street.trim() || 'Main Market',
-                            city: city.trim() || 'New Delhi',
-                            state: 'Delhi',
-                            pincode: pincode.trim() || '110001',
-                            landmark: ''
-                          },
-                          registeredAt: new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }),
-                          lastLoginAt: 'Just now',
-                          totalOrdersCount: 0,
-                          totalSpent: 0
-                        };
-                        onLogin(newProfile);
-                        onClose();
-                      }}
-                      className="w-full py-2.5 bg-stone-100 hover:bg-stone-200 text-stone-800 font-semibold rounded-xl transition text-xs flex items-center justify-center gap-1.5 border border-stone-300 cursor-pointer"
-                    >
-                      <CheckCircle2 className="w-4 h-4 text-emerald-700" />
-                      <span>1-Tap Instant Sign In (Fast Guest Access)</span>
                     </button>
                   </div>
                 </form>
