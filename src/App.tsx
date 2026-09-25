@@ -1624,7 +1624,7 @@ export default function App() {
       />
 
       {/* Owner Inventory Dashboard Modal - STRICTLY restricted to kp902430@gmail.com */}
-      {isOwnerAuthorized && ownerSession && (
+      {isOwnerAuthorized && ownerSession && isOwnerDashboardOpen && (
         <OwnerDashboardModal
           isOpen={isOwnerDashboardOpen}
           onClose={() => setIsOwnerDashboardOpen(false)}
