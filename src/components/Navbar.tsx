@@ -255,7 +255,6 @@ export const Navbar: React.FC<NavbarProps> = ({
             <button
               id="nav-reels-btn"
               onClick={() => {
-                setActiveView('reels');
                 onOpenReels();
               }}
               className={`relative px-3.5 py-1.5 rounded-xl transition-all duration-300 flex items-center gap-1.5 text-xs font-black uppercase tracking-wider cursor-pointer shadow-md group ${
@@ -475,7 +474,6 @@ export const Navbar: React.FC<NavbarProps> = ({
           </button>
           <button
             onClick={() => {
-              setActiveView('reels');
               onOpenReels();
               setIsMobileMenuOpen(false);
             }}

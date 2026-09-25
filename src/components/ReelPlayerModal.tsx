@@ -3,7 +3,7 @@ import { SareeReel, Saree } from '../types';
 import { getPublicStoreUrl } from '../utils/shareUrl';
 import { 
   X, Heart, Share2, Volume2, VolumeX, Play, Pause, 
-  ShoppingBag, Sparkles, Layers, Music, ArrowRight, ChevronUp, ChevronDown 
+  ShoppingBag, Sparkles, Layers, Music, ArrowRight, ChevronUp, ChevronDown, Film 
 } from 'lucide-react';
 
 interface ReelPlayerModalProps {
@@ -116,7 +116,32 @@ export const ReelPlayerModal: React.FC<ReelPlayerModalProps> = ({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isOpen, activeIndex, reels.length]);
 
-  if (!isOpen || !reels.length) return null;
+  if (!isOpen) return null;
+
+  if (reels.length === 0) {
+    return (
+      <div className="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-4">
+        <div className="w-full max-w-sm bg-stone-900 border border-amber-500/30 rounded-3xl p-6 text-center text-white space-y-4 shadow-2xl animate-scaleUp">
+          <div className="w-14 h-14 rounded-2xl bg-amber-400/20 border border-amber-400/30 flex items-center justify-center text-amber-300 mx-auto">
+            <Film className="w-7 h-7" />
+          </div>
+          <div>
+            <h3 className="font-bold text-base text-white">No Saree Reels Published Yet</h3>
+            <p className="text-xs text-stone-400 mt-1">
+              New vertical video drapes will be live soon.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="w-full py-2.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:opacity-95 text-stone-950 rounded-xl text-xs font-black transition cursor-pointer"
+          >
+            Close
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   const scrollToIndex = (idx: number) => {
     if (!containerRef.current || idx < 0 || idx >= reels.length) return;

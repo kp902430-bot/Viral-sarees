@@ -688,8 +688,19 @@ export default function App() {
   };
 
   // Reels Handlers
-  const handleOpenReel = (reelOrId: SareeReel | string) => {
-    const id = typeof reelOrId === 'string' ? reelOrId : reelOrId.id;
+  const handleOpenReel = (reelOrId?: SareeReel | string) => {
+    const activeReels = reels.length > 0 ? reels : INITIAL_REELS;
+    if (reels.length === 0 && INITIAL_REELS.length > 0) {
+      setReels(INITIAL_REELS);
+    }
+    let id = '';
+    if (typeof reelOrId === 'string') {
+      id = reelOrId;
+    } else if (reelOrId && typeof reelOrId === 'object') {
+      id = reelOrId.id;
+    } else {
+      id = activeReels[0]?.id || '';
+    }
     setSelectedReelId(id);
     setIsReelPlayerOpen(true);
   };
@@ -1083,10 +1094,7 @@ export default function App() {
         onOpenPrivacyPolicy={() => setIsPrivacyPolicyOpen(true)}
         onOpenAddSaree={handleTriggerAddSaree}
         onOpenOwnerDashboard={handleOpenOwnerPortal}
-        onOpenReels={() => {
-          setActiveView('reels');
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-        }}
+        onOpenReels={() => handleOpenReel()}
         onOpenInstallApp={() => setIsInstallAppOpen(true)}
         searchTerm={searchTerm}
         onSearchChange={setSearchTerm}
@@ -1419,10 +1427,7 @@ export default function App() {
               <ReelsStoryBar
                 reels={reels}
                 onSelectReel={handleOpenReel}
-                onOpenAllReels={() => {
-                  setActiveView('reels');
-                  window.scrollTo({ top: 0, behavior: 'smooth' });
-                }}
+                onOpenAllReels={() => handleOpenReel()}
               />
             </div>
 
@@ -1431,10 +1436,7 @@ export default function App() {
               reels={reels}
               sarees={sarees}
               onSelectReel={(reel) => handleOpenReel(reel.id)}
-              onOpenAllReels={() => {
-                setActiveView('reels');
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-              }}
+              onOpenAllReels={() => handleOpenReel()}
               onAddToCart={(s) => handleAddToCart(s)}
             />
 
@@ -1692,10 +1694,7 @@ export default function App() {
 
       {/* Floating Saree Reels Launcher Widget */}
       <FloatingReelsWidget
-        onOpenReels={() => {
-          setActiveView('reels');
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-        }}
+        onOpenReels={() => handleOpenReel()}
         reelsCount={reels.length}
       />
 
@@ -1709,8 +1708,7 @@ export default function App() {
           window.scrollTo({ top: 0, behavior: 'smooth' });
         }}
         onOpenReels={() => {
-          setActiveView('reels');
-          window.scrollTo({ top: 0, behavior: 'smooth' });
+          handleOpenReel();
         }}
         onOpenSearch={() => {
           setActiveView('home');
