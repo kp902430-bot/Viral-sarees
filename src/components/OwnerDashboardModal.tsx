@@ -62,6 +62,7 @@ export const OwnerDashboardModal: React.FC<OwnerDashboardModalProps> = ({
   const [isRefreshingOrders, setIsRefreshingOrders] = useState(false);
   const [orderSyncSuccess, setOrderSyncSuccess] = useState<string | null>(null);
   const [selectedOrderForShiprocket, setSelectedOrderForShiprocket] = useState<Order | null>(null);
+  const [sheetCopiedNotice, setSheetCopiedNotice] = useState<string | null>(null);
 
   useEffect(() => {
     if (activeTab === 'excel_ledger') {
@@ -241,8 +242,6 @@ export const OwnerDashboardModal: React.FC<OwnerDashboardModalProps> = ({
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
   };
-
-  const [sheetCopiedNotice, setSheetCopiedNotice] = useState<string | null>(null);
 
   // Copy current sheet data formatted as Tab-Separated Values (TSV) directly to clipboard
   // so the owner can press Ctrl+V in Google Sheets or Excel and it pastes into columns and rows!
