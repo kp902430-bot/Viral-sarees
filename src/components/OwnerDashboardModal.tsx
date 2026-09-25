@@ -392,38 +392,38 @@ export const OwnerDashboardModal: React.FC<OwnerDashboardModalProps> = ({
   const totalRevenue = orders.reduce((sum, o) => sum + (o.totalAmount || 0), 0);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/75 backdrop-blur-xs overflow-y-auto animate-fadeIn">
-      <div className="relative w-full max-w-5xl bg-white rounded-3xl shadow-2xl overflow-hidden my-6 flex flex-col max-h-[92vh] border-2 border-amber-500/40">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-0 sm:p-4 bg-black/80 backdrop-blur-xs overflow-hidden animate-fadeIn">
+      <div className="relative w-full h-[100dvh] sm:h-auto sm:max-h-[92vh] max-w-5xl bg-white rounded-none sm:rounded-3xl shadow-2xl flex flex-col border-0 sm:border-2 sm:border-amber-500/40 overflow-hidden">
         
-        {/* Top Header */}
-        <div className="bg-gradient-to-r from-[#590417] via-[#800020] to-[#3a020e] text-white p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        {/* Top Header - Fixed & Sticky */}
+        <div className="shrink-0 bg-gradient-to-r from-[#590417] via-[#800020] to-[#3a020e] text-white p-3.5 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-md z-20">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-2xl bg-amber-400/20 border border-amber-300/40 flex items-center justify-center text-amber-300">
-              <Crown className="w-6 h-6" />
+            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-amber-400/20 border border-amber-300/40 flex items-center justify-center text-amber-300 shrink-0">
+              <Crown className="w-5 h-5 sm:w-6 sm:h-6" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="text-xl font-bold font-serif-brand tracking-tight">
+                <h3 className="text-base sm:text-xl font-bold font-serif-brand tracking-tight">
                   Store Owner Administration Portal
                 </h3>
-                <span className="bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 text-[10px] px-2 py-0.5 rounded-full font-bold uppercase">
+                <span className="bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 text-[10px] px-2 py-0.5 rounded-full font-bold uppercase shrink-0">
                   Verified Owner
                 </span>
               </div>
-              <p className="text-xs text-stone-300 mt-0.5">
+              <p className="text-[11px] sm:text-xs text-stone-300 mt-0.5 truncate max-w-xs sm:max-w-none">
                 Logged in as: <strong>{session.email}</strong> • Session active
               </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 shrink-0">
             {onOpenAddReel && (
               <button
                 onClick={() => {
                   onClose();
                   onOpenAddReel();
                 }}
-                className="px-3 py-2 bg-amber-400/20 hover:bg-amber-400/30 text-amber-200 rounded-xl text-xs font-bold flex items-center gap-1.5 transition border border-amber-400/40 cursor-pointer"
+                className="px-2.5 sm:px-3 py-1.5 sm:py-2 bg-amber-400/20 hover:bg-amber-400/30 text-amber-200 rounded-xl text-xs font-bold flex items-center gap-1.5 transition border border-amber-400/40 cursor-pointer"
               >
                 <Film className="w-3.5 h-3.5 text-rose-400" />
                 <span>+ Add Reel</span>
@@ -434,25 +434,25 @@ export const OwnerDashboardModal: React.FC<OwnerDashboardModalProps> = ({
                 onLogout();
                 onClose();
               }}
-              className="px-3 py-2 bg-white/10 hover:bg-white/20 text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 transition border border-white/20"
+              className="px-2.5 sm:px-3 py-1.5 sm:py-2 bg-white/10 hover:bg-white/20 text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 transition border border-white/20 cursor-pointer"
             >
               <LogOut className="w-4 h-4" />
               <span>Logout</span>
             </button>
             <button
               onClick={onClose}
-              className="p-2 text-stone-300 hover:text-white rounded-full transition"
+              className="p-1.5 sm:p-2 text-stone-300 hover:text-white rounded-full transition cursor-pointer"
             >
               <X className="w-5 h-5" />
             </button>
           </div>
         </div>
 
-        {/* Navigation Tabs */}
-        <div className="flex items-center gap-2 px-6 pt-3 bg-stone-100 border-b border-stone-200 text-xs font-bold">
+        {/* Navigation Tabs - Swipe Left & Right effortlessly on all mobile screens */}
+        <div className="shrink-0 flex items-center gap-2 px-3 sm:px-6 pt-2 bg-stone-100 border-b border-stone-200 text-xs font-bold overflow-x-auto whitespace-nowrap scrollbar-thin overscroll-x-contain touch-pan-x z-10">
           <button
             onClick={() => setActiveTab('inventory')}
-            className={`pb-3 px-3.5 border-b-2 flex items-center gap-2 transition cursor-pointer ${
+            className={`pb-2.5 sm:pb-3 px-3 sm:px-3.5 border-b-2 flex items-center gap-2 transition cursor-pointer shrink-0 ${
               activeTab === 'inventory'
                 ? 'border-[#800020] text-[#800020]'
                 : 'border-transparent text-stone-500 hover:text-stone-800'
@@ -464,7 +464,7 @@ export const OwnerDashboardModal: React.FC<OwnerDashboardModalProps> = ({
 
           <button
             onClick={() => setActiveTab('customers')}
-            className={`pb-3 px-3.5 border-b-2 flex items-center gap-2 transition cursor-pointer ${
+            className={`pb-2.5 sm:pb-3 px-3 sm:px-3.5 border-b-2 flex items-center gap-2 transition cursor-pointer shrink-0 ${
               activeTab === 'customers'
                 ? 'border-[#800020] text-[#800020]'
                 : 'border-transparent text-stone-500 hover:text-stone-800'
@@ -479,7 +479,7 @@ export const OwnerDashboardModal: React.FC<OwnerDashboardModalProps> = ({
 
           <button
             onClick={() => setActiveTab('orders')}
-            className={`pb-3 px-3.5 border-b-2 flex items-center gap-2 transition cursor-pointer ${
+            className={`pb-2.5 sm:pb-3 px-3 sm:px-3.5 border-b-2 flex items-center gap-2 transition cursor-pointer shrink-0 ${
               activeTab === 'orders'
                 ? 'border-[#800020] text-[#800020]'
                 : 'border-transparent text-stone-500 hover:text-stone-800'
@@ -491,7 +491,7 @@ export const OwnerDashboardModal: React.FC<OwnerDashboardModalProps> = ({
 
           <button
             onClick={() => setActiveTab('shiprocket')}
-            className={`pb-3 px-3.5 border-b-2 flex items-center gap-2 transition cursor-pointer ${
+            className={`pb-2.5 sm:pb-3 px-3 sm:px-3.5 border-b-2 flex items-center gap-2 transition cursor-pointer shrink-0 ${
               activeTab === 'shiprocket'
                 ? 'border-[#800020] text-[#800020]'
                 : 'border-transparent text-stone-500 hover:text-stone-800'
@@ -506,7 +506,7 @@ export const OwnerDashboardModal: React.FC<OwnerDashboardModalProps> = ({
 
           <button
             onClick={() => setActiveTab('excel_ledger')}
-            className={`pb-3 px-3.5 border-b-2 flex items-center gap-2 transition cursor-pointer ${
+            className={`pb-2.5 sm:pb-3 px-3 sm:px-3.5 border-b-2 flex items-center gap-2 transition cursor-pointer shrink-0 ${
               activeTab === 'excel_ledger'
                 ? 'border-[#107c41] text-[#107c41] font-black'
                 : 'border-transparent text-emerald-800 hover:text-emerald-950 font-semibold'
@@ -520,51 +520,53 @@ export const OwnerDashboardModal: React.FC<OwnerDashboardModalProps> = ({
           </button>
         </div>
 
-        {/* Dashboard Metrics Strip */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 p-4 bg-stone-50 border-b border-stone-200 text-xs">
-          <div className="p-3 bg-white rounded-xl border border-stone-200">
-            <span className="text-stone-500 block text-[11px]">Total Registered Customers</span>
-            <span className="text-xl font-extrabold text-stone-900 font-mono">{customers.length}</span>
+        {/* Unified Scrollable Main Body - Full Touch Swiping Up & Down */}
+        <div className="flex-1 overflow-y-auto overflow-x-hidden p-3.5 sm:p-6 space-y-4 text-xs overscroll-y-contain touch-pan-y [webkit-overflow-scrolling:touch]">
+          {/* Dashboard Metrics Strip */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3 p-3 sm:p-4 bg-stone-50 rounded-2xl border border-stone-200 text-xs">
+            <div className="p-2.5 sm:p-3 bg-white rounded-xl border border-stone-200 shadow-2xs">
+              <span className="text-stone-500 block text-[10px] sm:text-[11px]">Total Registered Customers</span>
+              <span className="text-lg sm:text-xl font-extrabold text-stone-900 font-mono">{customers.length}</span>
+            </div>
+            <div className="p-2.5 sm:p-3 bg-white rounded-xl border border-stone-200 shadow-2xs">
+              <span className="text-stone-500 block text-[10px] sm:text-[11px]">Active Orders</span>
+              <span className="text-lg sm:text-xl font-extrabold text-emerald-700 font-mono">
+                {orders.length}
+              </span>
+            </div>
+            <div className="p-2.5 sm:p-3 bg-white rounded-xl border border-stone-200 shadow-2xs">
+              <span className="text-stone-500 block text-[10px] sm:text-[11px]">Total Customer Sales</span>
+              <span className="text-lg sm:text-xl font-extrabold text-amber-700 font-mono">
+                ₹{totalRevenue.toLocaleString('en-IN')}
+              </span>
+            </div>
+            <div className="p-2.5 sm:p-3 bg-amber-50 rounded-xl border border-amber-200 flex items-center justify-center shadow-2xs">
+              {activeTab === 'customers' ? (
+                <button
+                  onClick={handleExportCSV}
+                  className="w-full h-full py-2 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-lg transition text-xs flex items-center justify-center gap-1.5 shadow-xs cursor-pointer"
+                  title="Download full customer contacts in Excel/CSV"
+                >
+                  <Download className="w-4 h-4" />
+                  <span>Export Contacts (CSV)</span>
+                </button>
+              ) : (
+                <button
+                  onClick={() => {
+                    onClose();
+                    onOpenAddSaree();
+                  }}
+                  className="w-full h-full py-2 bg-[#800020] hover:bg-[#9B111E] text-amber-100 font-bold rounded-lg transition text-xs flex items-center justify-center gap-1.5 shadow-xs cursor-pointer"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>+ Add New Saree</span>
+                </button>
+              )}
+            </div>
           </div>
-          <div className="p-3 bg-white rounded-xl border border-stone-200">
-            <span className="text-stone-500 block text-[11px]">Active Orders</span>
-            <span className="text-xl font-extrabold text-emerald-700 font-mono">
-              {orders.length}
-            </span>
-          </div>
-          <div className="p-3 bg-white rounded-xl border border-stone-200">
-            <span className="text-stone-500 block text-[11px]">Total Customer Sales</span>
-            <span className="text-xl font-extrabold text-amber-700 font-mono">
-              ₹{totalRevenue.toLocaleString('en-IN')}
-            </span>
-          </div>
-          <div className="p-3 bg-amber-50 rounded-xl border border-amber-200 flex items-center justify-center">
-            {activeTab === 'customers' ? (
-              <button
-                onClick={handleExportCSV}
-                className="w-full h-full py-2 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-lg transition text-xs flex items-center justify-center gap-1.5 shadow-xs cursor-pointer"
-                title="Download full customer contacts in Excel/CSV"
-              >
-                <Download className="w-4 h-4" />
-                <span>Export Contacts (CSV)</span>
-              </button>
-            ) : (
-              <button
-                onClick={() => {
-                  onClose();
-                  onOpenAddSaree();
-                }}
-                className="w-full h-full py-2 bg-[#800020] hover:bg-[#9B111E] text-amber-100 font-bold rounded-lg transition text-xs flex items-center justify-center gap-1.5 shadow-xs cursor-pointer"
-              >
-                <Plus className="w-4 h-4" />
-                <span>+ Add New Saree</span>
-              </button>
-            )}
-          </div>
-        </div>
 
-        {/* Verified Public Customer Link (Fixes 403 Forbidden Error) */}
-        <div className="mx-4 sm:mx-6 mt-3.5 p-3.5 bg-gradient-to-r from-emerald-50 via-teal-50/60 to-white rounded-2xl border border-emerald-300 shadow-2xs">
+          {/* Verified Public Customer Link (Fixes 403 Forbidden Error) */}
+          <div className="p-3.5 bg-gradient-to-r from-emerald-50 via-teal-50/60 to-white rounded-2xl border border-emerald-300 shadow-2xs">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
             <div className="space-y-1">
               <div className="flex items-center gap-2">
@@ -639,7 +641,7 @@ export const OwnerDashboardModal: React.FC<OwnerDashboardModalProps> = ({
 
         {/* Tab 1: Catalogue Manager */}
         {activeTab === 'inventory' && (
-          <div className="overflow-y-auto p-6 flex-1 space-y-4 text-xs">
+          <div className="space-y-4">
             {/* Live Cloud Status & Instant Sync */}
             <div className="flex flex-wrap items-center justify-between gap-3 p-3.5 bg-gradient-to-r from-amber-50/70 via-stone-50 to-white border border-amber-200/80 rounded-2xl shadow-2xs">
               <div className="flex items-center gap-2.5">
@@ -725,9 +727,9 @@ export const OwnerDashboardModal: React.FC<OwnerDashboardModalProps> = ({
               />
             </div>
 
-            <div className="border border-stone-200 rounded-2xl overflow-hidden">
-              <div className="overflow-x-auto">
-                <table className="w-full text-left border-collapse">
+            <div className="border border-stone-200 rounded-2xl overflow-hidden bg-white shadow-2xs">
+              <div className="overflow-x-auto overscroll-x-contain touch-pan-x scrollbar-thin">
+                <table className="w-full min-w-[620px] text-left border-collapse">
                   <thead>
                     <tr className="bg-stone-100 border-b border-stone-200 text-stone-600 font-bold uppercase text-[10px] tracking-wider">
                       <th className="p-3">Product</th>
@@ -852,7 +854,7 @@ export const OwnerDashboardModal: React.FC<OwnerDashboardModalProps> = ({
 
         {/* Tab 2: Customer Directory & Contacts */}
         {activeTab === 'customers' && (
-          <div className="overflow-y-auto p-6 flex-1 space-y-4 text-xs">
+          <div className="space-y-4">
             <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-3">
               <div>
                 <h4 className="font-bold text-stone-900 text-sm flex items-center gap-1.5">
@@ -971,7 +973,7 @@ export const OwnerDashboardModal: React.FC<OwnerDashboardModalProps> = ({
 
         {/* Tab 3: Customer Orders */}
         {activeTab === 'orders' && (
-          <div className="overflow-y-auto p-6 flex-1 space-y-4 text-xs">
+          <div className="space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
               <div>
                 <h4 className="font-bold text-stone-900 text-sm flex items-center gap-1.5">
@@ -1202,7 +1204,7 @@ export const OwnerDashboardModal: React.FC<OwnerDashboardModalProps> = ({
 
         {/* Tab 4: Shiprocket Logistics & Multi-Courier Tie-Up Hub */}
         {activeTab === 'shiprocket' && (
-          <div className="overflow-y-auto p-6 flex-1 space-y-6 text-xs">
+          <div className="space-y-6">
             {/* Header Banner */}
             <div className="bg-linear-to-r from-blue-900 via-indigo-950 to-stone-950 p-5 rounded-2xl text-white border border-blue-800/40 shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
               <div className="space-y-1">
@@ -1387,7 +1389,7 @@ export const OwnerDashboardModal: React.FC<OwnerDashboardModalProps> = ({
 
         {/* Tab 5: Real-Time Excel Sheet Ledger (Logins, Customers & Orders) */}
         {activeTab === 'excel_ledger' && (
-          <div className="overflow-y-auto p-4 sm:p-6 flex-1 space-y-4 text-xs font-sans">
+          <div className="space-y-4 font-sans">
             
             {/* Excel Header Ribbon */}
             <div className="bg-[#107c41] text-white rounded-2xl p-4 sm:p-5 shadow-md border border-[#0d6133] flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -1527,7 +1529,7 @@ export const OwnerDashboardModal: React.FC<OwnerDashboardModalProps> = ({
             {/* SHEET 1: Customers Directory Table */}
             {excelSubSheet === 'customers' && (
               <div className="border border-stone-300 rounded-xl overflow-hidden bg-white shadow-xs">
-                <div className="overflow-x-auto max-h-[50vh]">
+                <div className="overflow-x-auto overscroll-x-contain touch-pan-x scrollbar-thin">
                   <table className="w-full text-left border-collapse font-sans text-xs">
                     <thead>
                       <tr className="bg-[#f3f4f6] border-b border-stone-300 text-stone-500 font-mono text-[10px] text-center">
@@ -1607,7 +1609,7 @@ export const OwnerDashboardModal: React.FC<OwnerDashboardModalProps> = ({
             {/* SHEET 2: Orders & Sales Ledger Table */}
             {excelSubSheet === 'orders' && (
               <div className="border border-stone-300 rounded-xl overflow-hidden bg-white shadow-xs">
-                <div className="overflow-x-auto max-h-[50vh]">
+                <div className="overflow-x-auto overscroll-x-contain touch-pan-x scrollbar-thin">
                   <table className="w-full text-left border-collapse font-sans text-xs">
                     <thead>
                       <tr className="bg-[#f3f4f6] border-b border-stone-300 text-stone-500 font-mono text-[10px] text-center">
@@ -1691,7 +1693,7 @@ export const OwnerDashboardModal: React.FC<OwnerDashboardModalProps> = ({
             {/* SHEET 3: Real-Time Customer Logins Table */}
             {excelSubSheet === 'logins' && (
               <div className="border border-stone-300 rounded-xl overflow-hidden bg-white shadow-xs">
-                <div className="overflow-x-auto max-h-[50vh]">
+                <div className="overflow-x-auto overscroll-x-contain touch-pan-x scrollbar-thin">
                   <table className="w-full text-left border-collapse font-sans text-xs">
                     <thead>
                       <tr className="bg-[#f3f4f6] border-b border-stone-300 text-stone-500 font-mono text-[10px] text-center">
@@ -1765,6 +1767,8 @@ export const OwnerDashboardModal: React.FC<OwnerDashboardModalProps> = ({
 
           </div>
         )}
+
+        </div>
 
       </div>
 
