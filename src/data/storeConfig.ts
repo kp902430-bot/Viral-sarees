@@ -29,7 +29,7 @@ export interface StoreConfiguration {
 export const DEFAULT_PAYMENT_GATEWAY: PaymentGatewaySettings = {
   isEnabled: true,
   registeredPhone: '7990651540',
-  registeredEmail: 'Kamal799065@gmail.com',
+  registeredEmail: 'payments@viralsarees.com',
   merchantName: 'Viral Sarees',
   merchantId: 'VIRAL_SAREES_7990651540',
   upiId: '7990651540@upi',
@@ -69,7 +69,7 @@ export const STORE_CONFIG: StoreConfiguration = {
   hsnCode: '5007 / 5208 (Silk & Cotton Fabrics)',
   officialPhone: '+91 79906 51540',
   whatsappNumber: '917990651540',
-  supportEmail: 'Kamal799065@gmail.com',
+  supportEmail: 'support@viralsarees.com',
   upiId: '7990651540@upi',
   dispatchHub: 'Viral Sarees Central Logistics Hub, Surat, Gujarat',
   paymentGateway: DEFAULT_PAYMENT_GATEWAY

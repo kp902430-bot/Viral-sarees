@@ -87,7 +87,7 @@ export const SHIPROCKET_COURIERS: ShiprocketCourierPartner[] = [
 export const DEFAULT_SHIPROCKET_CONFIG: ShiprocketConfig = {
   isEnabled: true,
   apiKey: 'sr_live_viralsarees_surat_key_2026',
-  email: 'Kamal799065@gmail.com',
+  email: 'logistics@viralsarees.com',
   pickupLocation: 'Surat Textile Market Hub',
   pickupPincode: '395002',
   defaultCourier: 'BLUEDART_AIR',

@@ -297,8 +297,8 @@ export const Navbar: React.FC<NavbarProps> = ({
               <span>Returns</span>
             </button>
 
-            {/* Owner Section - Always accessible for store owner */}
-            {ownerSession?.isLoggedIn ? (
+            {/* Owner Section - Only visible if the store owner is already logged in */}
+            {ownerSession?.isLoggedIn && (
               <div className="flex items-center gap-1.5 ml-1">
                 <button
                   id="nav-owner-dashboard-btn"
@@ -308,18 +308,6 @@ export const Navbar: React.FC<NavbarProps> = ({
                 >
                   <Crown className="w-3.5 h-3.5 text-amber-700" />
                   <span>Owner Portal</span>
-                </button>
-              </div>
-            ) : (
-              <div className="flex items-center gap-1.5 ml-1">
-                <button
-                  id="nav-owner-portal-btn"
-                  onClick={onOpenOwnerDashboard}
-                  className="px-2.5 py-1.5 rounded-lg bg-stone-100 hover:bg-amber-50 text-stone-700 hover:text-amber-950 border border-stone-200 hover:border-amber-300 transition flex items-center gap-1 font-bold text-xs shadow-xs cursor-pointer"
-                  title="Store Owner Portal Login"
-                >
-                  <Crown className="w-3.5 h-3.5 text-amber-600" />
-                  <span className="hidden sm:inline">Owner</span>
                 </button>
               </div>
             )}
@@ -525,8 +513,8 @@ export const Navbar: React.FC<NavbarProps> = ({
             <span>Privacy & Security Policy</span>
           </button>
 
-          {/* Owner options in mobile - Always accessible */}
-          {ownerSession?.isLoggedIn ? (
+          {/* Owner options in mobile - Only visible if logged in */}
+          {ownerSession?.isLoggedIn && (
             <>
               <button
                 onClick={() => {
@@ -549,17 +537,6 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <span>+ Add Saree to Catalogue</span>
               </button>
             </>
-          ) : (
-            <button
-              onClick={() => {
-                onOpenOwnerDashboard();
-                setIsMobileMenuOpen(false);
-              }}
-              className="w-full text-left px-3 py-2 rounded-lg bg-stone-100 hover:bg-stone-200 text-stone-900 font-bold flex items-center gap-2 cursor-pointer border border-stone-300"
-            >
-              <Crown className="w-4 h-4 text-amber-600" />
-              <span>👑 Store Owner Portal (Staff Login)</span>
-            </button>
           )}
           
           <div className="pt-3 border-t border-stone-100 flex items-center justify-between text-xs text-stone-500">

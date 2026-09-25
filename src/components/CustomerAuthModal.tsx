@@ -586,30 +586,6 @@ export const CustomerAuthModal: React.FC<CustomerAuthModalProps> = ({
                     </div>
                   </div>
 
-                  {fallbackCode && (
-                    <div className="p-3 bg-amber-50/90 border border-amber-300 rounded-2xl text-xs flex items-center justify-between gap-3 shadow-2xs">
-                      <div>
-                        <span className="text-[11px] text-amber-950 font-semibold block">
-                          Instant Verification Code:
-                        </span>
-                        <span className="font-mono font-extrabold text-lg text-[#800020] tracking-widest">
-                          {fallbackCode}
-                        </span>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          const digits = fallbackCode.split('');
-                          setOtpDigits(digits);
-                          executeVerifyAndLogin(fallbackCode);
-                        }}
-                        className="px-3.5 py-2 bg-[#800020] text-amber-100 hover:bg-[#9B111E] rounded-xl text-xs font-bold transition shadow-xs cursor-pointer active:scale-95"
-                      >
-                        Auto-Fill & Sign In
-                      </button>
-                    </div>
-                  )}
-
                   {/* Email Specific Spam & Direct Search Guidance */}
                   <div className="p-3 bg-amber-50/80 border border-amber-200/90 rounded-2xl text-xs text-stone-700 space-y-2">
                     <div className="flex items-start gap-2">
@@ -738,20 +714,6 @@ export const CustomerAuthModal: React.FC<CustomerAuthModalProps> = ({
             <span>Encrypted Direct OTP Verification • 100% Free</span>
           </div>
           <div className="flex items-center gap-3">
-            {onOpenOwnerPortal && (
-              <button
-                type="button"
-                onClick={() => {
-                  onClose();
-                  onOpenOwnerPortal();
-                }}
-                className="text-amber-800 hover:text-amber-950 font-bold flex items-center gap-1 transition cursor-pointer"
-                title="Store Owner Portal Login"
-              >
-                <Crown className="w-3.5 h-3.5 text-amber-600" />
-                <span>Store Owner? Login here</span>
-              </button>
-            )}
             <span className="font-serif-brand font-bold text-stone-700">Viral Sarees</span>
           </div>
         </div>

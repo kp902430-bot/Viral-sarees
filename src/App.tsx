@@ -480,10 +480,26 @@ export default function App() {
           setSelectedSaree(targetSaree);
         }
       }
+
+      // Secret Owner Gateway: ?owner=true or ?admin=true opens the merchant modal safely without exposing buttons to customers
+      if (params.get('owner') === 'true' || params.get('admin') === 'true' || params.get('portal') === 'true') {
+        handleOpenOwnerPortal();
+      }
+
+      // Secret Keyboard Shortcut: Ctrl + Shift + O (or Cmd + Shift + O)
+      const handleSecretKey = (e: KeyboardEvent) => {
+        if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'O' || e.key === 'o')) {
+          e.preventDefault();
+          handleOpenOwnerPortal();
+        }
+      };
+
+      window.addEventListener('keydown', handleSecretKey);
+      return () => window.removeEventListener('keydown', handleSecretKey);
     } catch (e) {
-      console.warn('Error reading deep link saree parameter:', e);
+      console.warn('Error reading deep link or secret gateway parameter:', e);
     }
-  }, [sarees]);
+  }, [sarees, ownerSession]);
 
   // Sync selectedSaree to browser URL search parameter for seamless direct sharing
   useEffect(() => {
